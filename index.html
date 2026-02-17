@@ -131,7 +131,6 @@
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // --- CONFIGURACIÓN DE FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyB1u6Bz1PsjPUuczQ6ZjvYaQVCxUbWdj9Q",
             authDomain: "airbnb-e780c.firebaseapp.com",
@@ -140,13 +139,12 @@
             messagingSenderId: "459942265651",
             appId: "1:459942265651:web:9ecd9c2e1c92804053f446"
         };
-        const apiKey = ""; // Gemini API
+        const apiKey = ""; // La clave se provee en el entorno de ejecución del Canvas
         const currentAppId = 'ph3-teques-live';
         const ADMIN_PASSWORD = "34650";
 
         let db, auth, siteData;
 
-        // DATOS DE RESPALDO (Incluyendo el Cerebro IA)
         const defaultData = {
             aiBrain: "CASA PH3: Tiene internet 10 mbps. 2 teles. 2 recamaras (King y litera matrimoniales). Roof Garden con jacuzzi y asador. Clave wifi: 123456789. Salida 12pm.",
             clubs: [
@@ -173,7 +171,6 @@
             ]
         };
 
-        // INTEGRACIÓN GEMINI API
         async function callGemini(userPrompt, systemInstruction) {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
             const payload = {
@@ -184,13 +181,16 @@
             for (let i = 0; i < 5; i++) {
                 try {
                     const response = await fetch(url, { method: 'POST', body: JSON.stringify(payload) });
+                    if (!response.ok) throw new Error('Network error');
                     const result = await response.json();
-                    return result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (aiText) return aiText;
+                    throw new Error('Empty response');
                 } catch (e) {
                     await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
                 }
             }
-            return "Lo siento, tuve un problema al procesar tu duda. Por favor contacta al host directamente.";
+            return "Lo siento, tuve un problema al procesar tu duda. Por favor contacta al host directamente por WhatsApp.";
         }
 
         async function init() {
@@ -200,6 +200,7 @@
                 auth = getAuth(app);
                 await signInAnonymously(auth);
 
+                // CORRECCIÓN: Ruta de 6 segmentos garantizada
                 const docRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'siteConfig', 'current');
                 
                 onSnapshot(docRef, (docSnap) => {
@@ -228,19 +229,18 @@
             const text = input.value.trim();
             if (!text) return;
 
-            // Mensaje usuario
             container.innerHTML += `<div class="flex justify-end"><div class="bg-cyan-600 text-white p-4 rounded-2xl rounded-tr-none shadow-sm text-xs italic text-white">${text}</div></div>`;
             input.value = "";
             container.scrollTop = container.scrollHeight;
 
-            // Cargando...
             const loaderId = "loader-" + Date.now();
             container.innerHTML += `<div class="flex gap-3" id="${loaderId}"><div class="w-8 h-8 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600 flex-shrink-0">✨</div><div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-slate-100 flex gap-1"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
             container.scrollTop = container.scrollHeight;
 
+            const brainContent = siteData?.aiBrain || "CASA PH3 en Tequesquitengo.";
             const sys = `Eres el concierge experto del PH3 en Tequesquitengo. 
-            CEREBRO DE DATOS: ${siteData.aiBrain}.
-            LUGARES RECOMENDADOS: ${JSON.stringify(siteData.clubs)} ${JSON.stringify(siteData.restaurants)}.
+            CEREBRO DE DATOS: ${brainContent}.
+            LUGARES RECOMENDADOS: ${JSON.stringify(siteData?.clubs || [])} ${JSON.stringify(siteData?.restaurants || [])}.
             Instrucciones: Sé amable, usa emojis y responde brevemente basándote SOLO en estos datos. Si no sabes algo, pide que contacten al host.`;
             
             const aiResponse = await callGemini(text, sys);
@@ -259,7 +259,6 @@
                             <p class="text-cyan-100 text-[10px] font-extrabold tracking-[0.3em] uppercase mb-2">Club Náutico Teques</p>
                             <h1 class="text-3xl font-extrabold mb-6 tracking-tight text-white">PH3 Bienvenida</h1>
                             
-                            <!-- BOTÓN IA CHAT -->
                             <div class="bg-white/10 backdrop-blur-lg border border-white/30 rounded-3xl p-4 shadow-2xl mb-4 max-w-[280px] mx-auto">
                                 <button onclick="openAI()" class="bg-white text-cyan-700 font-black py-3 px-6 rounded-2xl shadow-lg w-full active:scale-95 transition-all flex items-center justify-center gap-3 text-sm pulse-aqua text-cyan-700">
                                     <i class="fa-solid fa-comment-dots text-lg"></i> PREGÚNTALE A LA IA
@@ -276,8 +275,8 @@
                         </div>
                     </header>
 
-                    <div class="px-5 pt-8 space-y-3 relative z-20">
-                        <a href="https://es-l.airbnb.com/rooms/1387534837636074286?viralityEntryPoint=1&s=76" target="_blank" class="w-full bg-[#FF385C] text-white p-5 rounded-[2rem] shadow-lg flex items-center justify-between active:scale-95 transition-transform group text-white">
+                    <div class="px-5 pt-8 space-y-3 relative z-20 text-slate-700">
+                        <a href="https://es-l.airbnb.com/rooms/1387534837636074286" target="_blank" class="w-full bg-[#FF385C] text-white p-5 rounded-[2rem] shadow-lg flex items-center justify-between active:scale-95 transition-transform group text-white">
                             <div class="flex items-center text-white"><i class="fa-brands fa-airbnb text-3xl mr-4 text-white"></i><div><h3 class="font-black text-xs text-white uppercase tracking-tighter">Mi Anuncio en Airbnb</h3><p class="text-[9px] opacity-80 font-bold uppercase tracking-widest text-white">Reseñas y Contacto</p></div></div>
                             <i class="fa-solid fa-arrow-up-right-from-square text-xs text-white"></i>
                         </a>
@@ -294,56 +293,30 @@
                                     <div class="bg-white p-3 rounded-2xl border border-slate-100 text-center shadow-sm"><span class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Cluster</span><span class="text-slate-700 font-black">12A</span></div>
                                     <div class="bg-white p-3 rounded-2xl border border-slate-100 text-center shadow-sm"><span class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Cajón</span><span class="text-slate-700 font-black">#23 (P3)</span></div>
                                 </div>
-                                <div class="bg-white p-4 rounded-2xl border border-cyan-100 mb-4 shadow-inner text-[11px] text-slate-600 italic leading-relaxed">
-                                    La <strong>Caja de Seguridad Gris</strong> está frente a la puerta del PH3. El código se envía por mensaje privado antes de su check-in.<br><br>
-                                    1. Toca pantalla para activar. 2. Presiona números que brillen. 3. Pasa la tarjeta física.
+                                <div class="bg-white p-4 rounded-2xl border border-cyan-100 mt-4 mb-4 shadow-inner text-[11px] text-slate-600 italic leading-relaxed">
+                                    La <strong>Caja de Seguridad Gris</strong> está frente a la puerta del PH3. El código se envía por privado antes de su check-in.
                                 </div>
                             `)}
                             ${renderAccordion('Reglas de la Casa', 'fa-clipboard-check', 'red', `
                                 <div class="space-y-3 py-4 text-[11px] text-slate-700 italic">
-                                    <div class="flex items-center gap-3"><i class="fa-solid fa-ban text-red-500 w-5 text-center"></i> <span><strong>PROHIBIDO FIESTAS:</strong> Estancia exclusivamente familiar.</span></div>
-                                    <div class="flex items-center gap-3"><i class="fa-solid fa-volume-xmark text-red-500 w-5 text-center"></i> <span><strong>HORARIO SILENCIO:</strong> No ruidos tras las 11:00 PM.</span></div>
-                                    <div class="flex items-center gap-3"><i class="fa-solid fa-snowflake text-cyan-500 w-5 text-center"></i> <span><strong>A/C:</strong> Por favor apague los aires si sale.</span></div>
-                                </div>
-                            `)}
-                            ${renderAccordion('Instrucciones Generales', 'fa-house-laptop', 'indigo', `
-                                <div class="space-y-4 pt-4 pb-2">
-                                    <div class="bg-cyan-600 text-white p-4 rounded-2xl shadow-lg text-white"><h5 class="font-black text-[10px] uppercase italic mb-2 text-white">Jacuzzi:</h5><p class="italic text-[10px] text-white">El agua DEBE superar el nivel de los jets antes de encender las burbujas.</p></div>
-                                    <div class="bg-indigo-600 text-white p-4 rounded-2xl shadow-lg text-white"><h5 class="font-black text-[10px] uppercase italic mb-2 text-white">TV Roku:</h5><p class="italic text-[10px] text-white">Cierre sus sesiones personales antes de irse.</p></div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-ban text-red-500 w-5 text-center"></i> <span><strong>SIN FIESTAS:</strong> Estancia familiar.</span></div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-volume-xmark text-red-500 w-5 text-center"></i> <span><strong>SILENCIO:</strong> No ruidos tras las 11:00 PM.</span></div>
                                 </div>
                             `)}
                         </section>
 
                         <section>
                             <h3 class="text-[10px] font-black text-cyan-600 uppercase tracking-[0.3em] mb-4 pl-2 italic">Clubes de Playa</h3>
-                            <div class="carousel-container">${siteData.clubs.map(c => `
+                            <div class="carousel-container">${(siteData?.clubs || []).map(c => `
                                 <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-cyan-50 p-6 flex flex-col justify-between">
                                     <div><div class="flex justify-between items-center mb-4 text-cyan-900"><h4 class="font-black text-cyan-900 text-lg italic uppercase tracking-tighter">${c.name}</h4><i class="fa-solid ${c.icon} text-cyan-500 text-2xl"></i></div><p class="text-[10px] opacity-70 mb-6 italic text-slate-600 leading-relaxed">${c.desc}</p></div>
-                                    <a href="${c.link}" target="_blank" class="w-full bg-cyan-600 text-white py-3 rounded-2xl font-black text-[10px] text-center tracking-widest uppercase active:scale-95 shadow-lg shadow-cyan-100 text-white">Ver en Maps</a>
-                                </div>`).join('')}</div>
-                        </section>
-
-                        <section>
-                            <h3 class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em] mb-4 pl-2 italic">Gastronomía</h3>
-                            <div class="carousel-container">${siteData.restaurants.map(r => `
-                                <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-emerald-50 p-6 flex flex-col justify-between">
-                                    <div class="flex justify-between items-start mb-4 text-emerald-900"><h4 class="font-black text-lg italic uppercase tracking-tighter text-emerald-900">${r.name}</h4><i class="fa-solid fa-utensils text-emerald-500 text-xl"></i></div>
-                                    <p class="text-[10px] opacity-60 italic mb-4 text-slate-600">${r.desc}</p>
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <button onclick="openContactOptions('${r.name}', '${r.phone}')" class="bg-emerald-50 text-emerald-700 py-3 rounded-xl font-black text-[9px] border border-emerald-100 active:scale-95 text-emerald-700">LLAMAR</button>
-                                        <a href="${r.link}" target="_blank" class="bg-emerald-600 text-white py-3 rounded-xl font-black text-[9px] flex items-center justify-center active:scale-95 text-white">📍 MAPA</a>
-                                    </div>
+                                    <a href="${c.link}" target="_blank" class="w-full bg-cyan-600 text-white py-3 rounded-2xl font-black text-[10px] text-center tracking-widest uppercase active:scale-95 shadow-lg text-white">Ver en Maps</a>
                                 </div>`).join('')}</div>
                         </section>
 
                         <section id="check-out">
                             <div class="bg-slate-900 rounded-[3rem] p-9 text-white shadow-2xl text-center border-b-8 border-emerald-500 text-white">
                                 <h3 class="text-xl font-black mb-3 uppercase tracking-[0.2em] italic text-white uppercase tracking-widest">Salida 12:00 PM</h3>
-                                <ul class="text-[10px] space-y-3 opacity-60 uppercase font-bold tracking-[0.3em] mb-8 text-white italic">
-                                    <li>Apagar luces y A/C</li>
-                                    <li>Llaves en caja de seguridad</li>
-                                    <li>Cerrar caja y mezclar el código</li>
-                                </ul>
                                 <p class="text-emerald-400 font-black text-2xl italic animate-pulse text-emerald-400 uppercase tracking-widest">¡Feliz Viaje! 👋</p>
                             </div>
                         </section>
@@ -360,7 +333,7 @@
             return `<div class="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
                 <button onclick="toggleAccordion(this)" class="w-full px-6 py-5 flex justify-between items-center text-left text-slate-700 active:bg-slate-50 transition-colors">
                     <span class="font-extrabold text-sm flex items-center italic tracking-tight text-slate-700"><i class="fa-solid ${icon} mr-3 text-${color}-500 opacity-60"></i> ${title}</span>
-                    <i class="fa-solid fa-chevron-down text-slate-300 transition-transform"></i>
+                    <i class="fa-solid fa-chevron-down text-slate-300 transition-transform text-slate-300"></i>
                 </button>
                 <div class="accordion-content px-6 text-slate-600">${content}</div>
             </div>`;
@@ -371,11 +344,10 @@
             if(!editor) return;
             editor.innerHTML = '';
 
-            // SECCIÓN IA BRAIN
             let brainHtml = `<div class="bg-cyan-50 p-6 rounded-[2.5rem] shadow-inner text-slate-700">
                 <h3 class="text-xs font-black mb-4 uppercase text-cyan-800 italic">Cerebro de la IA</h3>
-                <textarea class="w-full bg-white border-2 border-cyan-100 rounded-2xl p-4 text-xs italic text-slate-600 h-40 outline-none" onchange="siteData.aiBrain = this.value">${siteData.aiBrain}</textarea>
-                <p class="mt-2 text-[9px] text-cyan-600 italic">Describe aquí reglas, detalles técnicos o instrucciones específicas de la casa para el chat.</p>
+                <textarea class="w-full bg-white border-2 border-cyan-100 rounded-2xl p-4 text-xs italic text-slate-600 h-40 outline-none" id="ai-brain-input" onchange="siteData.aiBrain = this.value">${siteData?.aiBrain || ''}</textarea>
+                <p class="mt-2 text-[9px] text-cyan-600 italic">Describe aquí reglas y detalles técnicos de la casa.</p>
             </div>`;
             editor.innerHTML += brainHtml;
 
@@ -388,9 +360,9 @@
             ];
             cats.forEach(cat => {
                 let html = `<div class="bg-slate-50 p-4 rounded-3xl mb-4 shadow-inner text-slate-700"><h3 class="text-xs font-black mb-4 uppercase tracking-widest text-slate-400 italic">${cat.l}</h3><div class="space-y-4">`;
-                siteData[cat.k].forEach((item, i) => {
+                (siteData[cat.k] || []).forEach((item, i) => {
                     html += `<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative text-slate-700">
-                        <button onclick="deleteItem('${cat.k}', ${i})" class="absolute top-2 right-2 text-red-300 hover:text-red-500"><i class="fa-solid fa-trash-can text-red-300"></i></button>
+                        <button onclick="deleteItem('${cat.k}', ${i})" class="absolute top-2 right-2 text-red-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
                         <input class="w-full border-b mb-2 p-1 text-sm font-bold outline-none text-slate-800" value="${item.name}" onchange="updateData('${cat.k}', ${i}, 'name', this.value)">
                         <textarea class="w-full border-b mb-2 p-1 text-[10px] italic outline-none text-slate-600" onchange="updateData('${cat.k}', ${i}, 'desc', this.value)">${item.desc || ''}</textarea>
                         <div class="flex gap-2"><input class="w-1/2 border-b p-1 text-[10px] outline-none text-slate-600" value="${item.phone || ''}" onchange="updateData('${cat.k}', ${i}, 'phone', this.value)" placeholder="Tel">
@@ -403,7 +375,11 @@
         }
 
         window.updateData = (cat, i, field, val) => { siteData[cat][i][field] = val; };
-        window.addItem = (cat) => { siteData[cat].push({ name: 'Nuevo Item', desc: '', phone: '', link: '', icon: 'fa-star' }); renderAdminForms(); };
+        window.addItem = (cat) => { 
+            if (!siteData[cat]) siteData[cat] = [];
+            siteData[cat].push({ name: 'Nuevo Item', desc: '', phone: '', link: '', icon: 'fa-star' }); 
+            renderAdminForms(); 
+        };
         window.deleteItem = (cat, i) => { siteData[cat].splice(i, 1); renderAdminForms(); };
         
         window.saveChanges = async () => {
@@ -412,12 +388,16 @@
             btn.disabled = true;
             try {
                 if (db) {
+                    // RUTA CORREGIDA: artifacts/{appId}/public/data/siteConfig/current (6 segmentos)
                     const docRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'siteConfig', 'current');
                     await setDoc(docRef, siteData);
                     alert("¡Guía actualizada!");
                 }
                 closeAdminPanel();
-            } catch (e) { alert("Error al guardar: " + e.message); }
+            } catch (e) { 
+                alert("Error al guardar: " + e.message); 
+                console.error(e);
+            }
             btn.innerHTML = 'Guardar Cambios'; btn.disabled = false; renderApp();
         };
 
@@ -444,23 +424,11 @@
             btn.querySelector('.fa-chevron-down').classList.toggle('rotate-180');
         };
         window.copyWifi = () => {
-            navigator.clipboard.writeText('123456789'); alert("Copiado!");
+            const pass = '123456789';
+            navigator.clipboard.writeText(pass);
+            alert("¡Contraseña copiada!");
         };
         window.scrollToSection = (id) => document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-        window.openContactOptions = (name, phone, mapUrl = null, isEmergency = false) => {
-            const modal = document.getElementById('contactModal');
-            document.getElementById('modal-contact-name').innerText = name;
-            document.getElementById('modal-contact-phone').innerText = phone;
-            document.getElementById('btn-call').href = `tel:${phone}`;
-            const waBtn = document.getElementById('btn-whatsapp');
-            if (isEmergency) waBtn.classList.add('hidden');
-            else { waBtn.classList.remove('hidden'); waBtn.href = `https://wa.me/52${phone.replace(/\D/g, '')}`; }
-            const mapBtn = document.getElementById('btn-map');
-            if (mapUrl) { mapBtn.href = mapUrl; mapBtn.classList.replace('hidden', 'flex'); }
-            else mapBtn.classList.replace('flex', 'hidden');
-            modal.classList.remove('hidden');
-        };
-        window.closeModal = () => document.getElementById('contactModal').classList.add('hidden');
 
         init();
     </script>
@@ -477,7 +445,6 @@
                         <div class="space-y-3">
                             <a id="btn-call" href="#" class="flex w-full justify-center items-center rounded-2xl bg-slate-900 py-4 text-[11px] font-black text-white shadow-xl uppercase tracking-widest transition-transform text-white">📞 LLAMAR</a>
                             <a id="btn-whatsapp" href="#" target="_blank" class="flex w-full justify-center items-center rounded-2xl bg-[#25D366] py-4 text-[11px] font-black text-white shadow-xl italic transition-transform text-white">WHATSAPP</a>
-                            <a id="btn-map" href="#" target="_blank" class="hidden w-full justify-center items-center rounded-2xl bg-cyan-600 py-4 text-[11px] font-black text-white shadow-xl uppercase transition-transform text-white">📍 MAPA</a>
                         </div>
                     </div>
                 </div>
