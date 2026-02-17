@@ -20,10 +20,13 @@
         .parallax > use { animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite; }
         @keyframes move-forever { 0% { transform: translate3d(-90px,0,0); } 100% { transform: translate3d(85px,0,0); } }
         
-        .admin-panel { display: none; position: fixed; inset: 0; background: white; z-index: 100; overflow-y: auto; }
+        .admin-panel { display: none; position: fixed; inset: 0; background: white; z-index: 200; overflow-y: auto; }
         .admin-panel.active { display: block; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         
+        .ai-modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(8px); z-index: 300; }
+        .ai-modal.active { display: flex; align-items: center; justify-content: center; }
+
         footer { margin-bottom: 0 !important; }
         .pulse-aqua { animation: pulse-aqua-animation 2s infinite; }
         @keyframes pulse-aqua-animation {
@@ -31,6 +34,11 @@
             70% { box-shadow: 0 0 0 12px rgba(37, 211, 102, 0); }
             100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
         }
+
+        .typing-dot { width: 6px; height: 6px; background: #06b6d4; border-radius: 50%; animation: typing 1s infinite ease-in-out; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
     </style>
 </head>
 <body class="bg-[#F0FDFD] text-slate-800 antialiased">
@@ -40,6 +48,40 @@
         <div class="p-20 text-center text-cyan-600 flex flex-col items-center justify-center min-h-screen">
             <i class="fa-solid fa-circle-notch animate-spin text-4xl mb-4 text-cyan-500"></i>
             <p class="font-bold uppercase tracking-widest text-xs text-cyan-700">Sincronizando PH3...</p>
+        </div>
+    </div>
+
+    <!-- MODAL IA: ASISTENTE -->
+    <div id="ai-concierge-modal" class="ai-modal p-4">
+        <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden max-h-[90vh]">
+            <div class="bg-gradient-to-r from-cyan-600 to-teal-500 p-6 text-white flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl">✨</div>
+                    <div>
+                        <h3 class="font-black uppercase italic text-sm tracking-tighter text-white">Asistente PH3</h3>
+                        <p class="text-[9px] opacity-80 font-bold uppercase text-white">Pregúntame lo que quieras</p>
+                    </div>
+                </div>
+                <button onclick="closeAI()" class="bg-white/10 p-2 rounded-full hover:bg-white/20 text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div id="chat-container" class="flex-grow overflow-y-auto p-6 space-y-4 bg-slate-50 min-h-[350px]">
+                <div class="flex gap-3">
+                    <div class="w-8 h-8 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600 flex-shrink-0">✨</div>
+                    <div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm text-xs leading-relaxed text-slate-700 italic border border-slate-100">
+                        ¡Hola! Soy tu asistente virtual. ¿Tienes dudas sobre el Jacuzzi, el Wifi o necesitas una recomendación? Estoy aquí para ayudarte.
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t bg-white">
+                <div class="flex gap-2">
+                    <input type="text" id="chat-input" placeholder="Pregunta algo sobre tu estancia..." class="flex-grow bg-slate-100 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cyan-500 outline-none text-slate-800">
+                    <button onclick="sendMessage()" id="sendBtn" class="bg-cyan-600 text-white w-12 h-12 rounded-xl flex items-center justify-center shadow-lg active:scale-90 transition-all">
+                        <i class="fa-solid fa-paper-plane text-white"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -80,7 +122,7 @@
 
     <!-- BOTÓN ACCESO ADMIN (DISCRETO) -->
     <button onclick="requestAdminAccess()" class="fixed bottom-4 left-4 z-40 opacity-10 hover:opacity-100 bg-slate-800 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all">
-        <i class="fa-solid fa-gear"></i>
+        <i class="fa-solid fa-gear text-white"></i>
     </button>
 
     <!-- Firebase SDK -->
@@ -98,14 +140,15 @@
             messagingSenderId: "459942265651",
             appId: "1:459942265651:web:9ecd9c2e1c92804053f446"
         };
-
+        const apiKey = ""; // Gemini API
         const currentAppId = 'ph3-teques-live';
         const ADMIN_PASSWORD = "34650";
 
         let db, auth, siteData;
 
-        // DATOS DE RESPALDO
-        siteData = {
+        // DATOS DE RESPALDO (Incluyendo el Cerebro IA)
+        const defaultData = {
+            aiBrain: "CASA PH3: Tiene internet 10 mbps. 2 teles. 2 recamaras (King y litera matrimoniales). Roof Garden con jacuzzi y asador. Clave wifi: 123456789. Salida 12pm.",
             clubs: [
                 { id: 1, name: 'Paradise', desc: 'Excelente vista, alberca, bar y acceso directo al lago.', link: 'https://share.google/YlpZUbnx8PZsF0HMq', icon: 'fa-umbrella-beach' },
                 { id: 2, name: 'Vikingos', desc: 'Ambiente clásico, muy buena comida y excelente servicio.', link: 'https://share.google/PEeBakGml2VYtPnoC', icon: 'fa-ship' }
@@ -130,6 +173,26 @@
             ]
         };
 
+        // INTEGRACIÓN GEMINI API
+        async function callGemini(userPrompt, systemInstruction) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] }
+            };
+
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const response = await fetch(url, { method: 'POST', body: JSON.stringify(payload) });
+                    const result = await response.json();
+                    return result.candidates?.[0]?.content?.parts?.[0]?.text;
+                } catch (e) {
+                    await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
+                }
+            }
+            return "Lo siento, tuve un problema al procesar tu duda. Por favor contacta al host directamente.";
+        }
+
         async function init() {
             try {
                 const app = initializeApp(firebaseConfig);
@@ -137,25 +200,54 @@
                 auth = getAuth(app);
                 await signInAnonymously(auth);
 
-                // RUTA CORRECTA: 6 SEGMENTOS (Colección/Documento/Colección/Documento/Colección/Documento)
                 const docRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'siteConfig', 'current');
                 
                 onSnapshot(docRef, (docSnap) => {
                     if (docSnap.exists()) {
                         siteData = docSnap.data();
                     } else {
+                        siteData = defaultData;
                         setDoc(docRef, siteData);
                     }
                     renderApp();
                 }, (err) => {
                     console.warn("Fallo en sincronización, usando local:", err);
+                    siteData = defaultData;
                     renderApp();
                 });
             } catch (e) {
                 console.error("Fallo inicialización:", e);
+                siteData = defaultData;
                 renderApp();
             }
         }
+
+        window.sendMessage = async () => {
+            const input = document.getElementById('chat-input');
+            const container = document.getElementById('chat-container');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Mensaje usuario
+            container.innerHTML += `<div class="flex justify-end"><div class="bg-cyan-600 text-white p-4 rounded-2xl rounded-tr-none shadow-sm text-xs italic text-white">${text}</div></div>`;
+            input.value = "";
+            container.scrollTop = container.scrollHeight;
+
+            // Cargando...
+            const loaderId = "loader-" + Date.now();
+            container.innerHTML += `<div class="flex gap-3" id="${loaderId}"><div class="w-8 h-8 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600 flex-shrink-0">✨</div><div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-slate-100 flex gap-1"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+            container.scrollTop = container.scrollHeight;
+
+            const sys = `Eres el concierge experto del PH3 en Tequesquitengo. 
+            CEREBRO DE DATOS: ${siteData.aiBrain}.
+            LUGARES RECOMENDADOS: ${JSON.stringify(siteData.clubs)} ${JSON.stringify(siteData.restaurants)}.
+            Instrucciones: Sé amable, usa emojis y responde brevemente basándote SOLO en estos datos. Si no sabes algo, pide que contacten al host.`;
+            
+            const aiResponse = await callGemini(text, sys);
+            document.getElementById(loaderId).remove();
+            container.innerHTML += `<div class="flex gap-3"><div class="w-8 h-8 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600 flex-shrink-0">✨</div><div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm text-xs italic leading-relaxed text-slate-700 border border-slate-100">${aiResponse}</div></div>`;
+            container.scrollTop = container.scrollHeight;
+        };
 
         function renderApp() {
             const container = document.getElementById('app-content');
@@ -165,7 +257,15 @@
                         <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/graphy.png')] rounded-b-[3.5rem]"></div>
                         <div class="relative">
                             <p class="text-cyan-100 text-[10px] font-extrabold tracking-[0.3em] uppercase mb-2">Club Náutico Teques</p>
-                            <h1 class="text-3xl font-extrabold mb-6 tracking-tight">PH3 Bienvenida</h1>
+                            <h1 class="text-3xl font-extrabold mb-6 tracking-tight text-white">PH3 Bienvenida</h1>
+                            
+                            <!-- BOTÓN IA CHAT -->
+                            <div class="bg-white/10 backdrop-blur-lg border border-white/30 rounded-3xl p-4 shadow-2xl mb-4 max-w-[280px] mx-auto">
+                                <button onclick="openAI()" class="bg-white text-cyan-700 font-black py-3 px-6 rounded-2xl shadow-lg w-full active:scale-95 transition-all flex items-center justify-center gap-3 text-sm pulse-aqua text-cyan-700">
+                                    <i class="fa-solid fa-comment-dots text-lg"></i> PREGÚNTALE A LA IA
+                                </button>
+                            </div>
+
                             <div class="bg-white/10 backdrop-blur-lg border border-white/30 rounded-3xl p-5 shadow-2xl">
                                 <div class="flex items-center justify-center mb-2"><i class="fa-solid fa-wifi text-xl mr-3 opacity-80 text-white"></i><span class="font-bold text-lg uppercase text-white">Teques_wifi</span></div>
                                 <div class="bg-white/95 text-teal-900 rounded-lg py-3 px-4 font-mono text-xl tracking-wider mb-4 shadow-inner border border-cyan-50">123456789</div>
@@ -182,8 +282,8 @@
                             <i class="fa-solid fa-arrow-up-right-from-square text-xs text-white"></i>
                         </a>
                         <div class="grid grid-cols-2 gap-3">
-                            <button onclick="window.open('https://maps.app.goo.gl/oweNu9vusZ8gK31t7', '_blank')" class="bg-white rounded-2xl p-4 shadow-md border border-cyan-50 flex flex-col items-center active:scale-95 transition-transform"><i class="fa-solid fa-location-arrow text-cyan-500 text-xl mb-1"></i><span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Llegada</span></button>
-                            <button onclick="scrollToSection('check-out')" class="bg-white rounded-2xl p-4 shadow-md border border-cyan-50 flex flex-col items-center text-emerald-600 active:scale-95 transition-transform"><i class="fa-solid fa-door-open text-xl mb-1"></i><span class="text-[9px] font-black uppercase text-emerald-600 tracking-widest">Salida</span></button>
+                            <button onclick="window.open('https://maps.app.goo.gl/oweNu9vusZ8gK31t7', '_blank')" class="bg-white rounded-2xl p-4 shadow-md border border-cyan-50 flex flex-col items-center active:scale-95 transition-transform text-slate-500"><i class="fa-solid fa-location-arrow text-cyan-500 text-xl mb-1"></i><span class="text-[9px] font-black uppercase tracking-widest">Llegada</span></button>
+                            <button onclick="scrollToSection('check-out')" class="bg-white rounded-2xl p-4 shadow-md border border-cyan-50 flex flex-col items-center text-emerald-600 active:scale-95 transition-transform"><i class="fa-solid fa-door-open text-xl mb-1"></i><span class="text-[9px] font-black uppercase tracking-widest text-emerald-600">Salida</span></button>
                         </div>
                     </div>
 
@@ -208,8 +308,8 @@
                             `)}
                             ${renderAccordion('Instrucciones Generales', 'fa-house-laptop', 'indigo', `
                                 <div class="space-y-4 pt-4 pb-2">
-                                    <div class="bg-cyan-600 text-white p-4 rounded-2xl shadow-lg"><h5 class="font-black text-[10px] uppercase italic mb-2">Jacuzzi:</h5><p class="italic text-[10px]">El agua DEBE superar el nivel de los jets antes de encender las burbujas.</p></div>
-                                    <div class="bg-indigo-600 text-white p-4 rounded-2xl shadow-lg"><h5 class="font-black text-[10px] uppercase italic mb-2">TV Roku:</h5><p class="italic text-[10px]">Cierre sus sesiones personales antes de irse.</p></div>
+                                    <div class="bg-cyan-600 text-white p-4 rounded-2xl shadow-lg text-white"><h5 class="font-black text-[10px] uppercase italic mb-2 text-white">Jacuzzi:</h5><p class="italic text-[10px] text-white">El agua DEBE superar el nivel de los jets antes de encender las burbujas.</p></div>
+                                    <div class="bg-indigo-600 text-white p-4 rounded-2xl shadow-lg text-white"><h5 class="font-black text-[10px] uppercase italic mb-2 text-white">TV Roku:</h5><p class="italic text-[10px] text-white">Cierre sus sesiones personales antes de irse.</p></div>
                                 </div>
                             `)}
                         </section>
@@ -218,8 +318,8 @@
                             <h3 class="text-[10px] font-black text-cyan-600 uppercase tracking-[0.3em] mb-4 pl-2 italic">Clubes de Playa</h3>
                             <div class="carousel-container">${siteData.clubs.map(c => `
                                 <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-cyan-50 p-6 flex flex-col justify-between">
-                                    <div><div class="flex justify-between items-center mb-4"><h4 class="font-black text-cyan-900 text-lg italic uppercase tracking-tighter">${c.name}</h4><i class="fa-solid ${c.icon} text-cyan-500 text-2xl"></i></div><p class="text-[10px] opacity-70 mb-6 italic text-slate-600 leading-relaxed">${c.desc}</p></div>
-                                    <a href="${c.link}" target="_blank" class="w-full bg-cyan-600 text-white py-3 rounded-2xl font-black text-[10px] text-center tracking-widest uppercase active:scale-95 shadow-lg shadow-cyan-100">Ver en Maps</a>
+                                    <div><div class="flex justify-between items-center mb-4 text-cyan-900"><h4 class="font-black text-cyan-900 text-lg italic uppercase tracking-tighter">${c.name}</h4><i class="fa-solid ${c.icon} text-cyan-500 text-2xl"></i></div><p class="text-[10px] opacity-70 mb-6 italic text-slate-600 leading-relaxed">${c.desc}</p></div>
+                                    <a href="${c.link}" target="_blank" class="w-full bg-cyan-600 text-white py-3 rounded-2xl font-black text-[10px] text-center tracking-widest uppercase active:scale-95 shadow-lg shadow-cyan-100 text-white">Ver en Maps</a>
                                 </div>`).join('')}</div>
                         </section>
 
@@ -227,71 +327,29 @@
                             <h3 class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em] mb-4 pl-2 italic">Gastronomía</h3>
                             <div class="carousel-container">${siteData.restaurants.map(r => `
                                 <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-emerald-50 p-6 flex flex-col justify-between">
-                                    <div class="flex justify-between items-start mb-4 text-emerald-900"><h4 class="font-black text-lg italic uppercase tracking-tighter">${r.name}</h4><i class="fa-solid fa-utensils text-emerald-500 text-xl"></i></div>
+                                    <div class="flex justify-between items-start mb-4 text-emerald-900"><h4 class="font-black text-lg italic uppercase tracking-tighter text-emerald-900">${r.name}</h4><i class="fa-solid fa-utensils text-emerald-500 text-xl"></i></div>
                                     <p class="text-[10px] opacity-60 italic mb-4 text-slate-600">${r.desc}</p>
                                     <div class="grid grid-cols-2 gap-2">
-                                        <button onclick="openContactOptions('${r.name}', '${r.phone}')" class="bg-emerald-50 text-emerald-700 py-3 rounded-xl font-black text-[9px] border border-emerald-100 active:scale-95">LLAMAR</button>
-                                        <a href="${r.link}" target="_blank" class="bg-emerald-600 text-white py-3 rounded-xl font-black text-[9px] flex items-center justify-center active:scale-95">📍 MAPA</a>
+                                        <button onclick="openContactOptions('${r.name}', '${r.phone}')" class="bg-emerald-50 text-emerald-700 py-3 rounded-xl font-black text-[9px] border border-emerald-100 active:scale-95 text-emerald-700">LLAMAR</button>
+                                        <a href="${r.link}" target="_blank" class="bg-emerald-600 text-white py-3 rounded-xl font-black text-[9px] flex items-center justify-center active:scale-95 text-white">📍 MAPA</a>
                                     </div>
                                 </div>`).join('')}</div>
-                        </section>
-
-                        <section>
-                            <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em] mb-4 pl-2 italic">Aventura</h3>
-                            <div class="carousel-container">${siteData.adventure.map(a => `
-                                <div class="carousel-item bg-slate-900 rounded-[2.5rem] shadow-xl p-7 text-white flex flex-col justify-between">
-                                    <div><div class="flex justify-between items-center mb-4 text-white"><h4 class="font-black text-2xl tracking-tighter italic uppercase text-white">${a.name}</h4><i class="fa-solid ${a.icon || 'fa-ship'} text-blue-400 text-2xl"></i></div><p class="text-[10px] text-slate-400 italic mb-6 leading-relaxed">${a.desc}</p></div>
-                                    <button onclick="openContactOptions('${a.name}', '${a.phone}')" class="w-full bg-blue-600 py-4 rounded-2xl font-black text-[10px] tracking-widest active:scale-95 uppercase shadow-lg shadow-blue-900/20">📞 Reservar Ahora</button>
-                                </div>`).join('')}</div>
-                        </section>
-
-                        <section>
-                            <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em] mb-4 pl-2 italic">Más Actividades</h3>
-                            <div class="carousel-container">${siteData.extra.map(x => `
-                                <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-indigo-50 p-6 flex flex-col justify-between">
-                                    <div><div class="flex justify-between items-center mb-4 text-indigo-900"><h4 class="font-black text-lg italic uppercase text-indigo-900">${x.name}</h4><i class="fa-solid ${x.icon || 'fa-star'} text-indigo-500 text-2xl"></i></div><p class="text-[10px] opacity-70 mb-6 italic text-slate-600 leading-relaxed">${x.desc}</p></div>
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <button onclick="openContactOptions('${x.name}', '${x.phone}')" class="bg-indigo-50 text-indigo-700 py-3 rounded-xl font-black text-[9px] active:scale-95">LLAMAR</button>
-                                        ${x.link ? `<a href="${x.link}" target="_blank" class="bg-indigo-600 text-white py-3 rounded-xl font-black text-[9px] flex items-center justify-center active:scale-95">📍 MAPA</a>` : `<span></span>`}
-                                    </div>
-                                </div>`).join('')}</div>
-                        </section>
-
-                        <section>
-                            <div class="bg-white rounded-[2.5rem] border border-emerald-100 shadow-md p-6 text-slate-700 text-center">
-                                <h4 class="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-5 italic">Pedidos y Servicios</h4>
-                                <div class="space-y-2 mb-5">${siteData.delivery.map(d => `
-                                    <button onclick="openContactOptions('${d.name}', '${d.phone}')" class="w-full bg-white p-3 rounded-xl border flex justify-between items-center text-xs text-slate-700 italic active:bg-slate-50">
-                                        <span>${d.name}</span><i class="fa-solid fa-phone text-emerald-400"></i>
-                                    </button>`).join('')}
-                                </div>
-                                <button onclick="openContactOptions('Taxi Seguro', '7343470734')" class="w-full bg-white p-4 rounded-xl border-2 border-cyan-100 flex justify-between items-center text-xs font-black text-cyan-700 active:scale-95 transition-transform text-cyan-700 uppercase italic"><span>🚕 Taxis Seguros</span><i class="fa-solid fa-phone"></i></button>
-                            </div>
                         </section>
 
                         <section id="check-out">
-                            <div class="bg-slate-900 rounded-[3rem] p-9 text-white shadow-2xl text-center border-b-8 border-emerald-500">
+                            <div class="bg-slate-900 rounded-[3rem] p-9 text-white shadow-2xl text-center border-b-8 border-emerald-500 text-white">
                                 <h3 class="text-xl font-black mb-3 uppercase tracking-[0.2em] italic text-white uppercase tracking-widest">Salida 12:00 PM</h3>
                                 <ul class="text-[10px] space-y-3 opacity-60 uppercase font-bold tracking-[0.3em] mb-8 text-white italic">
                                     <li>Apagar luces y A/C</li>
                                     <li>Llaves en caja de seguridad</li>
                                     <li>Cerrar caja y mezclar el código</li>
                                 </ul>
-                                <p class="text-emerald-400 font-black text-2xl italic animate-pulse">¡Feliz Viaje! 👋</p>
+                                <p class="text-emerald-400 font-black text-2xl italic animate-pulse text-emerald-400 uppercase tracking-widest">¡Feliz Viaje! 👋</p>
                             </div>
                         </section>
                     </div>
 
                     <footer class="bg-white pt-10 pb-0 relative overflow-hidden border-t border-slate-50 text-center">
-                        <div class="px-8 mb-12 relative z-20 text-red-500">
-                            <h3 class="text-[10px] font-black uppercase tracking-[0.5em] mb-8 italic">Emergencias</h3>
-                            <div class="grid grid-cols-3 gap-3">
-                                <button onclick="openContactOptions('Cruz Roja', '7343413301', 'https://maps.app.goo.gl/A6ADB9838fUmupkT9', true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700"><i class="fa-solid fa-truck-medical text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter">Cruz Roja</span></button>
-                                <button onclick="openContactOptions('Bomberos', '7343423400', null, true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700"><i class="fa-solid fa-fire-extinguisher text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter">Bomberos</span></button>
-                                <button onclick="openContactOptions('Policía', '7343422696', null, true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700"><i class="fa-solid fa-shield-halved text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter">Policía</span></button>
-                            </div>
-                        </div>
-                        <h2 class="text-2xl font-black tracking-[0.5em] text-cyan-400 uppercase italic pb-2">Tequesquitengo</h2>
                         <div class="relative leading-[0]"><svg class="waves" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none"><defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" /></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0" fill="rgba(6, 182, 212, 0.2)" /><use href="#gentle-wave" x="48" y="3" fill="rgba(20, 184, 166, 0.15)" /></g></svg></div>
                     </footer>
                 </div>`;
@@ -300,11 +358,11 @@
 
         function renderAccordion(title, icon, color, content) {
             return `<div class="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
-                <button onclick="toggleAccordion(this)" class="w-full px-6 py-5 flex justify-between items-center text-left active:bg-slate-50 transition-colors">
-                    <span class="font-extrabold text-slate-700 text-sm flex items-center italic tracking-tight"><i class="fa-solid ${icon} mr-3 text-${color}-500 opacity-60"></i> ${title}</span>
+                <button onclick="toggleAccordion(this)" class="w-full px-6 py-5 flex justify-between items-center text-left text-slate-700 active:bg-slate-50 transition-colors">
+                    <span class="font-extrabold text-sm flex items-center italic tracking-tight text-slate-700"><i class="fa-solid ${icon} mr-3 text-${color}-500 opacity-60"></i> ${title}</span>
                     <i class="fa-solid fa-chevron-down text-slate-300 transition-transform"></i>
                 </button>
-                <div class="accordion-content px-6">${content}</div>
+                <div class="accordion-content px-6 text-slate-600">${content}</div>
             </div>`;
         }
 
@@ -312,6 +370,15 @@
             const editor = document.getElementById('admin-editor');
             if(!editor) return;
             editor.innerHTML = '';
+
+            // SECCIÓN IA BRAIN
+            let brainHtml = `<div class="bg-cyan-50 p-6 rounded-[2.5rem] shadow-inner text-slate-700">
+                <h3 class="text-xs font-black mb-4 uppercase text-cyan-800 italic">Cerebro de la IA</h3>
+                <textarea class="w-full bg-white border-2 border-cyan-100 rounded-2xl p-4 text-xs italic text-slate-600 h-40 outline-none" onchange="siteData.aiBrain = this.value">${siteData.aiBrain}</textarea>
+                <p class="mt-2 text-[9px] text-cyan-600 italic">Describe aquí reglas, detalles técnicos o instrucciones específicas de la casa para el chat.</p>
+            </div>`;
+            editor.innerHTML += brainHtml;
+
             const cats = [
                 { k: 'clubs', l: 'Clubes de Playa' },
                 { k: 'restaurants', l: 'Restaurantes' },
@@ -320,17 +387,17 @@
                 { k: 'delivery', l: 'Servicios' }
             ];
             cats.forEach(cat => {
-                let html = `<div class="bg-slate-50 p-4 rounded-3xl mb-4 shadow-inner"><h3 class="text-xs font-black mb-4 uppercase tracking-widest text-slate-400 italic">${cat.l}</h3><div class="space-y-4">`;
+                let html = `<div class="bg-slate-50 p-4 rounded-3xl mb-4 shadow-inner text-slate-700"><h3 class="text-xs font-black mb-4 uppercase tracking-widest text-slate-400 italic">${cat.l}</h3><div class="space-y-4">`;
                 siteData[cat.k].forEach((item, i) => {
-                    html += `<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative">
-                        <button onclick="deleteItem('${cat.k}', ${i})" class="absolute top-2 right-2 text-red-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+                    html += `<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative text-slate-700">
+                        <button onclick="deleteItem('${cat.k}', ${i})" class="absolute top-2 right-2 text-red-300 hover:text-red-500"><i class="fa-solid fa-trash-can text-red-300"></i></button>
                         <input class="w-full border-b mb-2 p-1 text-sm font-bold outline-none text-slate-800" value="${item.name}" onchange="updateData('${cat.k}', ${i}, 'name', this.value)">
                         <textarea class="w-full border-b mb-2 p-1 text-[10px] italic outline-none text-slate-600" onchange="updateData('${cat.k}', ${i}, 'desc', this.value)">${item.desc || ''}</textarea>
                         <div class="flex gap-2"><input class="w-1/2 border-b p-1 text-[10px] outline-none text-slate-600" value="${item.phone || ''}" onchange="updateData('${cat.k}', ${i}, 'phone', this.value)" placeholder="Tel">
                         <input class="w-1/2 border-b p-1 text-[10px] outline-none text-slate-600" value="${item.link || ''}" onchange="updateData('${cat.k}', ${i}, 'link', this.value)" placeholder="URL"></div>
                     </div>`;
                 });
-                html += `<button onclick="addItem('${cat.k}')" class="w-full border-2 border-dashed border-slate-200 py-3 rounded-2xl text-slate-300 font-bold text-[10px] uppercase tracking-widest">+ AGREGAR ITEM</button></div></div>`;
+                html += `<button onclick="addItem('${cat.k}')" class="w-full border-2 border-dashed border-slate-200 py-3 rounded-2xl text-slate-300 font-bold text-[10px] uppercase tracking-widest transition-colors hover:text-cyan-500 hover:border-cyan-200">+ AGREGAR ITEM</button></div></div>`;
                 editor.innerHTML += html;
             });
         }
@@ -341,59 +408,45 @@
         
         window.saveChanges = async () => {
             const btn = document.getElementById('saveBtn');
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin mr-2"></i> SINCRONIZANDO...';
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin mr-2 text-white"></i> SINCRONIZANDO...';
             btn.disabled = true;
             try {
                 if (db) {
-                    // RUTA FORZADA DE 6 PARTES: artifacts (1) / currentAppId (2) / public (3) / data (4) / siteConfig (5) / current (6)
                     const docRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'siteConfig', 'current');
                     await setDoc(docRef, siteData);
-                    alert("¡Guía actualizada en la nube!");
-                } else alert("Error de conexión. Verifique Firebase.");
+                    alert("¡Guía actualizada!");
+                }
                 closeAdminPanel();
             } catch (e) { alert("Error al guardar: " + e.message); }
             btn.innerHTML = 'Guardar Cambios'; btn.disabled = false; renderApp();
         };
 
+        window.openAI = () => document.getElementById('ai-concierge-modal').classList.add('active');
+        window.closeAI = () => document.getElementById('ai-concierge-modal').classList.remove('active');
         window.requestAdminAccess = () => {
             document.getElementById('admin-pass-input').value = "";
             document.getElementById('pass-error').classList.add('hidden');
             document.getElementById('password-modal').classList.remove('hidden');
             document.getElementById('admin-pass-input').focus();
         };
-
         window.closePasswordModal = () => document.getElementById('password-modal').classList.add('hidden');
-
         window.checkAdminPassword = () => {
-            const input = document.getElementById('admin-pass-input').value;
-            if (input === ADMIN_PASSWORD) {
+            if (document.getElementById('admin-pass-input').value === ADMIN_PASSWORD) {
                 closePasswordModal();
                 document.getElementById('admin-panel').classList.add('active');
             } else {
                 document.getElementById('pass-error').classList.remove('hidden');
-                document.getElementById('admin-pass-input').value = "";
             }
         };
-
         window.closeAdminPanel = () => document.getElementById('admin-panel').classList.remove('active');
-
         window.toggleAccordion = (btn) => {
-            const content = btn.nextElementSibling;
-            const icon = btn.querySelector('.fa-chevron-down');
-            content.classList.toggle('open');
-            if (icon) icon.classList.toggle('rotate-180');
+            btn.nextElementSibling.classList.toggle('open');
+            btn.querySelector('.fa-chevron-down').classList.toggle('rotate-180');
         };
-
         window.copyWifi = () => {
-            const pass = '123456789';
-            navigator.clipboard.writeText(pass);
-            const btn = document.getElementById('wifiBtn');
-            btn.innerHTML = '<span>¡COPIADA!</span>';
-            setTimeout(() => { renderApp(); }, 2000);
+            navigator.clipboard.writeText('123456789'); alert("Copiado!");
         };
-
         window.scrollToSection = (id) => document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-
         window.openContactOptions = (name, phone, mapUrl = null, isEmergency = false) => {
             const modal = document.getElementById('contactModal');
             document.getElementById('modal-contact-name').innerText = name;
@@ -407,36 +460,24 @@
             else mapBtn.classList.replace('flex', 'hidden');
             modal.classList.remove('hidden');
         };
-
         window.closeModal = () => document.getElementById('contactModal').classList.add('hidden');
-
-        window.shareDiscovery = () => {
-            const template = `¡Hola! Descubrí algo increíble en Teques que quiero recomendar para futuros huéspedes:\n\n📍 Nombre:\n✨ Recomendación:`;
-            window.location.assign(`https://wa.me/525554317512?text=${encodeURIComponent(template)}`);
-        };
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !document.getElementById('password-modal').classList.contains('hidden')) {
-                checkAdminPassword();
-            }
-        });
 
         init();
     </script>
 
     <div id="contactModal" class="fixed inset-0 z-[100] hidden text-slate-700">
         <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeModal()"></div>
-        <div class="flex min-h-full items-center justify-center p-6 text-center">
+        <div class="flex min-h-full items-center justify-center p-6 text-center text-slate-700">
             <div class="relative transform overflow-hidden rounded-[3rem] bg-white text-left shadow-2xl transition-all w-full max-w-xs border border-cyan-50">
-                <div class="bg-white px-6 pb-10 pt-12 text-center relative">
+                <div class="bg-white px-6 pb-10 pt-12 text-center relative text-slate-700">
                     <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-cyan-100 to-emerald-50 rounded-b-[50%] -mt-10 opacity-40"></div>
-                    <div class="relative z-10">
+                    <div class="relative z-10 text-slate-700">
                         <h3 class="text-xl font-black mb-1 italic uppercase text-slate-800" id="modal-contact-name">Nombre</h3>
                         <p class="text-2xl font-mono text-teal-800 font-black mb-10 italic" id="modal-contact-phone">0000000000</p>
                         <div class="space-y-3">
-                            <a id="btn-call" href="#" class="flex w-full justify-center items-center rounded-2xl bg-slate-900 py-4 text-[11px] font-black text-white shadow-xl uppercase tracking-widest transition-transform">📞 LLAMAR</a>
-                            <a id="btn-whatsapp" href="#" target="_blank" class="flex w-full justify-center items-center rounded-2xl bg-[#25D366] py-4 text-[11px] font-black text-white shadow-xl italic transition-transform">WHATSAPP</a>
-                            <a id="btn-map" href="#" target="_blank" class="hidden w-full justify-center items-center rounded-2xl bg-cyan-600 py-4 text-[11px] font-black text-white shadow-xl uppercase transition-transform">📍 MAPA</a>
+                            <a id="btn-call" href="#" class="flex w-full justify-center items-center rounded-2xl bg-slate-900 py-4 text-[11px] font-black text-white shadow-xl uppercase tracking-widest transition-transform text-white">📞 LLAMAR</a>
+                            <a id="btn-whatsapp" href="#" target="_blank" class="flex w-full justify-center items-center rounded-2xl bg-[#25D366] py-4 text-[11px] font-black text-white shadow-xl italic transition-transform text-white">WHATSAPP</a>
+                            <a id="btn-map" href="#" target="_blank" class="hidden w-full justify-center items-center rounded-2xl bg-cyan-600 py-4 text-[11px] font-black text-white shadow-xl uppercase transition-transform text-white">📍 MAPA</a>
                         </div>
                     </div>
                 </div>
@@ -445,9 +486,9 @@
         </div>
     </div>
 
-    <a href="https://wa.me/525554317512" target="_blank" class="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white py-4 px-6 rounded-full shadow-2xl flex items-center gap-3 hover:bg-[#20bd5a] transition-all pulse-aqua border-2 border-white/30">
-        <i class="fa-brands fa-whatsapp text-2xl"></i>
-        <span class="font-black text-xs tracking-tight uppercase">AYUDA HOST</span>
+    <a href="https://wa.me/525554317512" target="_blank" class="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white py-4 px-6 rounded-full shadow-2xl flex items-center gap-3 hover:bg-[#20bd5a] transition-all pulse-aqua border-2 border-white/30 text-white">
+        <i class="fa-brands fa-whatsapp text-2xl text-white"></i>
+        <span class="font-black text-xs tracking-tight uppercase text-white">AYUDA HOST</span>
     </a>
 </body>
 </html>
