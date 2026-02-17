@@ -46,14 +46,14 @@
     <!-- MODAL DE CONTRASEÑA ADMIN -->
     <div id="password-modal" class="fixed inset-0 z-[120] hidden">
         <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closePasswordModal()"></div>
-        <div class="flex min-h-full items-center justify-center p-6">
+        <div class="flex min-h-full items-center justify-center p-6 text-slate-700">
             <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-xs shadow-2xl relative text-center">
                 <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
                     <i class="fa-solid fa-lock text-2xl"></i>
                 </div>
                 <h3 class="text-lg font-black text-slate-800 mb-2 uppercase italic tracking-tighter">Acceso Restringido</h3>
                 <p class="text-xs text-slate-500 mb-6">Ingresa la clave para editar la guía</p>
-                <input type="password" id="admin-pass-input" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-6 text-center text-xl font-black tracking-[0.5em] outline-none focus:border-cyan-500 transition-all mb-4" placeholder="••••">
+                <input type="password" id="admin-pass-input" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-6 text-center text-xl font-black tracking-[0.5em] outline-none focus:border-cyan-500 transition-all mb-4 text-slate-800" placeholder="••••">
                 <button onclick="checkAdminPassword()" class="w-full bg-slate-800 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all">Entrar</button>
                 <p id="pass-error" class="text-red-500 text-[10px] font-bold mt-3 hidden uppercase italic">Contraseña incorrecta</p>
             </div>
@@ -100,7 +100,7 @@
         };
 
         const currentAppId = 'ph3-teques-live';
-        const ADMIN_PASSWORD = "3465"; // CAMBIA TU CONTRASEÑA AQUÍ
+        const ADMIN_PASSWORD = "1234"; // CAMBIA TU CONTRASEÑA AQUÍ
 
         let db, auth, siteData;
 
@@ -137,16 +137,20 @@
                 auth = getAuth(app);
                 await signInAnonymously(auth);
 
-                const docRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'siteConfig');
+                // FIX: La ruta ahora tiene 6 segmentos para ser un documento válido
+                // artifacts (col) / appId (doc) / public (col) / data (doc) / siteConfig (col) / current (doc)
+                const docRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'siteConfig', 'current');
+                
                 onSnapshot(docRef, (docSnap) => {
                     if (docSnap.exists()) siteData = docSnap.data();
                     else setDoc(docRef, siteData);
                     renderApp();
                 }, (err) => {
-                    console.warn("Usando local:", err);
+                    console.warn("Fallo en sincronización, usando local:", err);
                     renderApp();
                 });
             } catch (e) {
+                console.error("Fallo inicialización:", e);
                 renderApp();
             }
         }
@@ -155,11 +159,11 @@
             const container = document.getElementById('app-content');
             container.innerHTML = `
                 <div class="flex-grow">
-                    <header class="bg-gradient-to-br from-cyan-600 via-teal-500 to-emerald-500 text-white p-8 rounded-b-[3.5rem] shadow-xl text-center relative z-10">
+                    <header class="bg-gradient-to-br from-cyan-600 via-teal-500 to-emerald-500 text-white p-8 rounded-b-[3.5rem] shadow-xl text-center relative z-10 text-white">
                         <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/graphy.png')] rounded-b-[3.5rem]"></div>
                         <div class="relative">
                             <p class="text-cyan-100 text-[10px] font-extrabold tracking-[0.3em] uppercase mb-2">Club Náutico Teques</p>
-                            <h1 class="text-3xl font-extrabold mb-6 tracking-tight text-white">PH3 Bienvenida</h1>
+                            <h1 class="text-3xl font-extrabold mb-6 tracking-tight">PH3 Bienvenida</h1>
                             <div class="bg-white/10 backdrop-blur-lg border border-white/30 rounded-3xl p-5 shadow-2xl">
                                 <div class="flex items-center justify-center mb-2"><i class="fa-solid fa-wifi text-xl mr-3 opacity-80 text-white"></i><span class="font-bold text-lg uppercase text-white">Teques_wifi</span></div>
                                 <div class="bg-white/95 text-teal-900 rounded-lg py-3 px-4 font-mono text-xl tracking-wider mb-4 shadow-inner border border-cyan-50">123456789</div>
@@ -172,7 +176,7 @@
 
                     <div class="px-5 pt-8 space-y-3 relative z-20">
                         <a href="https://es-l.airbnb.com/rooms/1387534837636074286?viralityEntryPoint=1&s=76" target="_blank" class="w-full bg-[#FF385C] text-white p-5 rounded-[2rem] shadow-lg flex items-center justify-between active:scale-95 transition-transform group text-white">
-                            <div class="flex items-center"><i class="fa-brands fa-airbnb text-3xl mr-4 text-white"></i><div><h3 class="font-black text-xs text-white uppercase tracking-tighter">Mi Anuncio en Airbnb</h3><p class="text-[9px] opacity-80 font-bold uppercase tracking-widest text-white">Reseñas y Contacto</p></div></div>
+                            <div class="flex items-center text-white"><i class="fa-brands fa-airbnb text-3xl mr-4 text-white"></i><div><h3 class="font-black text-xs text-white uppercase tracking-tighter">Mi Anuncio en Airbnb</h3><p class="text-[9px] opacity-80 font-bold uppercase tracking-widest text-white">Reseñas y Contacto</p></div></div>
                             <i class="fa-solid fa-arrow-up-right-from-square text-xs text-white"></i>
                         </a>
                         <div class="grid grid-cols-2 gap-3">
@@ -194,10 +198,10 @@
                                 </div>
                             `)}
                             ${renderAccordion('Reglas de la Casa', 'fa-clipboard-check', 'red', `
-                                <div class="space-y-3 py-4 text-[11px] text-slate-700 italic">
-                                    <div class="flex items-center gap-3"><i class="fa-solid fa-ban text-red-500 w-5 text-center"></i> <span><strong>PROHIBIDO FIESTAS:</strong> Estancia exclusivamente familiar.</span></div>
-                                    <div class="flex items-center gap-3"><i class="fa-solid fa-volume-xmark text-red-500 w-5 text-center"></i> <span><strong>HORARIO SILENCIO:</strong> Después de las 11:00 PM.</span></div>
-                                    <div class="flex items-center gap-3"><i class="fa-solid fa-snowflake text-cyan-500 w-5 text-center"></i> <span><strong>A/C:</strong> Apague los aires si sale del departamento.</span></div>
+                                <div class="space-y-3 py-4 text-[11px] text-slate-700 italic text-slate-700 italic">
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-ban text-red-500 w-5 text-center"></i> <span><strong>PROHIBIDO FIESTAS:</strong> Estancia exclusivamente familiar únicamente.</span></div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-volume-xmark text-red-500 w-5 text-center"></i> <span><strong>HORARIO SILENCIO:</strong> No ruidos exteriores tras las 11:00 PM.</span></div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-snowflake text-cyan-500 w-5 text-center"></i> <span><strong>A/C:</strong> Por favor apague los aires si sale del departamento.</span></div>
                                     <div class="flex items-center gap-3"><i class="fa-solid fa-sink text-emerald-500 w-5 text-center"></i> <span><strong>LIMPIEZA:</strong> Lave los trastes para evitar hormigas.</span></div>
                                 </div>
                             `)}
@@ -210,7 +214,7 @@
                         </section>
 
                         <section>
-                            <h3 class="text-[10px] font-black text-cyan-600 uppercase tracking-[0.3em] mb-4 pl-2 italic">Clubes de Playa</h3>
+                            <h3 class="text-[10px] font-black text-cyan-600 uppercase tracking-[0.3em] mb-4 pl-2 italic text-cyan-600">Clubes de Playa</h3>
                             <div class="carousel-container">${siteData.clubs.map(c => `
                                 <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-cyan-50 p-6 flex flex-col justify-between">
                                     <div><div class="flex justify-between items-center mb-4"><h4 class="font-black text-cyan-900 text-lg italic uppercase tracking-tighter">${c.name}</h4><i class="fa-solid ${c.icon} text-cyan-500 text-2xl"></i></div><p class="text-[10px] opacity-70 mb-6 italic text-slate-600 leading-relaxed">${c.desc}</p></div>
@@ -219,7 +223,7 @@
                         </section>
 
                         <section>
-                            <h3 class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em] mb-4 pl-2 italic">Gastronomía</h3>
+                            <h3 class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em] mb-4 pl-2 italic text-emerald-600">Gastronomía</h3>
                             <div class="carousel-container">${siteData.restaurants.map(r => `
                                 <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-emerald-50 p-6 flex flex-col justify-between">
                                     <div class="flex justify-between items-start mb-4 text-emerald-900"><h4 class="font-black text-lg italic uppercase tracking-tighter">${r.name}</h4><i class="fa-solid fa-utensils text-emerald-500 text-xl"></i></div>
@@ -232,29 +236,29 @@
                         </section>
 
                         <section>
-                            <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em] mb-4 pl-2 italic">Aventura</h3>
+                            <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em] mb-4 pl-2 italic text-blue-600">Aventura</h3>
                             <div class="carousel-container">${siteData.adventure.map(a => `
                                 <div class="carousel-item bg-slate-900 rounded-[2.5rem] shadow-xl p-7 text-white flex flex-col justify-between">
-                                    <div><div class="flex justify-between items-center mb-4 text-white"><h4 class="font-black text-2xl tracking-tighter italic uppercase text-white">${a.name}</h4><i class="fa-solid ${a.icon || 'fa-ship'} text-blue-400 text-2xl text-blue-400"></i></div><p class="text-[10px] text-slate-400 italic mb-6 leading-relaxed">${a.desc}</p></div>
+                                    <div><div class="flex justify-between items-center mb-4 text-white"><h4 class="font-black text-2xl tracking-tighter italic uppercase text-white">${a.name}</h4><i class="fa-solid ${a.icon || 'fa-ship'} text-blue-400 text-2xl text-blue-400"></i></div><p class="text-[10px] text-slate-400 italic mb-6 leading-relaxed text-slate-400 italic leading-relaxed">${a.desc}</p></div>
                                     <button onclick="openContactOptions('${a.name}', '${a.phone}')" class="w-full bg-blue-600 py-4 rounded-2xl font-black text-[10px] tracking-widest active:scale-95 text-white uppercase shadow-lg shadow-blue-900/20 text-white">📞 Reservar Ahora</button>
                                 </div>`).join('')}</div>
                         </section>
 
                         <section>
-                            <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em] mb-4 pl-2 italic">Más Actividades</h3>
+                            <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em] mb-4 pl-2 italic text-indigo-600">Más Actividades</h3>
                             <div class="carousel-container">${siteData.extra.map(x => `
                                 <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-indigo-50 p-6 flex flex-col justify-between">
-                                    <div><div class="flex justify-between items-center mb-4 text-indigo-900"><h4 class="font-black text-lg italic uppercase text-indigo-900">${x.name}</h4><i class="fa-solid ${x.icon || 'fa-star'} text-indigo-500 text-2xl text-indigo-500"></i></div><p class="text-[10px] opacity-70 mb-6 italic text-slate-600 leading-relaxed">${x.desc}</p></div>
+                                    <div><div class="flex justify-between items-center mb-4 text-indigo-900"><h4 class="font-black text-lg italic uppercase text-indigo-900">${x.name}</h4><i class="fa-solid ${x.icon || 'fa-star'} text-indigo-500 text-2xl text-indigo-500"></i></div><p class="text-[10px] opacity-70 mb-6 italic text-slate-600 leading-relaxed text-slate-600 leading-relaxed italic">${x.desc}</p></div>
                                     <div class="grid grid-cols-2 gap-2">
                                         <button onclick="openContactOptions('${x.name}', '${x.phone}')" class="bg-indigo-50 text-indigo-700 py-3 rounded-xl font-black text-[9px] active:scale-95 text-indigo-700">LLAMAR</button>
-                                        ${x.link ? `<a href="${x.link}" target="_blank" class="bg-indigo-600 text-white py-3 rounded-xl font-black text-[9px] flex items-center justify-center text-white active:scale-95">📍 MAPA</a>` : `<span></span>`}
+                                        ${x.link ? `<a href="${x.link}" target="_blank" class="bg-indigo-600 text-white py-3 rounded-xl font-black text-[9px] flex items-center justify-center active:scale-95 text-white">📍 MAPA</a>` : `<span></span>`}
                                     </div>
                                 </div>`).join('')}</div>
                         </section>
 
                         <section>
-                            <div class="bg-white rounded-[2.5rem] border border-emerald-100 shadow-md p-6 text-slate-700 text-center">
-                                <h4 class="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-5 italic">Pedidos y Servicios</h4>
+                            <div class="bg-white rounded-[2.5rem] border border-emerald-100 shadow-md p-6 text-slate-700 text-center text-slate-700 text-center">
+                                <h4 class="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-5 italic text-emerald-700 uppercase">Pedidos y Servicios</h4>
                                 <div class="space-y-2 mb-5">${siteData.delivery.map(d => `
                                     <button onclick="openContactOptions('${d.name}', '${d.phone}')" class="w-full bg-white p-3 rounded-xl border flex justify-between items-center text-xs text-slate-700 italic active:bg-slate-50">
                                         <span>${d.name}</span><i class="fa-solid fa-phone text-emerald-400"></i>
@@ -265,28 +269,28 @@
                         </section>
 
                         <section id="check-out">
-                            <div class="bg-slate-900 rounded-[3rem] p-9 text-white shadow-2xl text-center border-b-8 border-emerald-500">
-                                <h3 class="text-xl font-black mb-3 uppercase tracking-[0.2em] italic text-white uppercase tracking-widest">Salida 12:00 PM</h3>
-                                <ul class="text-[10px] space-y-3 opacity-60 uppercase font-bold tracking-[0.3em] mb-8 text-white italic">
+                            <div class="bg-slate-900 rounded-[3rem] p-9 text-white shadow-2xl text-center border-b-8 border-emerald-500 text-white shadow-2xl text-center">
+                                <h3 class="text-xl font-black mb-3 uppercase tracking-[0.2em] italic text-white uppercase tracking-widest text-white uppercase">Salida 12:00 PM</h3>
+                                <ul class="text-[10px] space-y-3 opacity-60 uppercase font-bold tracking-[0.3em] mb-8 text-white italic text-white italic">
                                     <li>Apagar luces y A/C</li>
                                     <li>Llaves en caja de seguridad</li>
                                     <li>Cerrar caja y mezclar el código</li>
                                 </ul>
-                                <p class="text-emerald-400 font-black text-2xl italic animate-pulse text-emerald-400 uppercase">¡Feliz Viaje! 👋</p>
+                                <p class="text-emerald-400 font-black text-2xl italic animate-pulse text-emerald-400 uppercase text-emerald-400 uppercase italic animate-pulse">¡Feliz Viaje! 👋</p>
                             </div>
                         </section>
                     </div>
 
-                    <footer class="bg-white pt-10 pb-0 relative overflow-hidden border-t border-slate-50 text-center">
-                        <div class="px-8 mb-12 relative z-20 text-red-500">
-                            <h3 class="text-[10px] font-black uppercase tracking-[0.5em] mb-8 italic text-red-500 uppercase">Emergencias</h3>
+                    <footer class="bg-white pt-10 pb-0 relative overflow-hidden border-t border-slate-50 text-center bg-white pt-10 pb-0 relative overflow-hidden text-center">
+                        <div class="px-8 mb-12 relative z-20 text-red-500 text-red-500">
+                            <h3 class="text-[10px] font-black uppercase tracking-[0.5em] mb-8 italic text-red-500 uppercase text-red-500 italic uppercase">Emergencias</h3>
                             <div class="grid grid-cols-3 gap-3">
-                                <button onclick="openContactOptions('Cruz Roja', '7343413301', 'https://maps.app.goo.gl/A6ADB9838fUmupkT9', true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700"><i class="fa-solid fa-truck-medical text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter">Cruz Roja</span></button>
-                                <button onclick="openContactOptions('Bomberos', '7343423400', null, true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700"><i class="fa-solid fa-fire-extinguisher text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter">Bomberos</span></button>
-                                <button onclick="openContactOptions('Policía', '7343422696', null, true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700"><i class="fa-solid fa-shield-halved text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter">Policía</span></button>
+                                <button onclick="openContactOptions('Cruz Roja', '7343413301', 'https://maps.app.goo.gl/A6ADB9838fUmupkT9', true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700"><i class="fa-solid fa-truck-medical text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter text-red-700 uppercase">Cruz Roja</span></button>
+                                <button onclick="openContactOptions('Bomberos', '7343423400', null, true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700"><i class="fa-solid fa-fire-extinguisher text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter text-red-700 uppercase">Bomberos</span></button>
+                                <button onclick="openContactOptions('Policía', '7343422696', null, true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700"><i class="fa-solid fa-shield-halved text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter text-red-700 uppercase">Policía</span></button>
                             </div>
                         </div>
-                        <h2 class="text-2xl font-black tracking-[0.5em] text-cyan-400 uppercase italic pb-2">Tequesquitengo</h2>
+                        <h2 class="text-2xl font-black tracking-[0.5em] text-cyan-400 uppercase italic pb-2 text-cyan-400 uppercase italic pb-2">Tequesquitengo</h2>
                         <div class="relative leading-[0]"><svg class="waves" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none"><defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" /></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0" fill="rgba(6, 182, 212, 0.2)" /><use href="#gentle-wave" x="48" y="3" fill="rgba(20, 184, 166, 0.15)" /></g></svg></div>
                     </footer>
                 </div>`;
@@ -319,10 +323,10 @@
                 siteData[cat.k].forEach((item, i) => {
                     html += `<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative text-slate-700">
                         <button onclick="deleteItem('${cat.k}', ${i})" class="absolute top-2 right-2 text-red-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
-                        <input class="w-full border-b mb-2 p-1 text-sm font-bold outline-none text-slate-800" value="${item.name}" onchange="updateData('${cat.k}', ${i}, 'name', this.value)">
-                        <textarea class="w-full border-b mb-2 p-1 text-[10px] italic outline-none text-slate-600" onchange="updateData('${cat.k}', ${i}, 'desc', this.value)">${item.desc || ''}</textarea>
-                        <div class="flex gap-2"><input class="w-1/2 border-b p-1 text-[10px] outline-none text-slate-600" value="${item.phone || ''}" onchange="updateData('${cat.k}', ${i}, 'phone', this.value)" placeholder="Tel">
-                        <input class="w-1/2 border-b p-1 text-[10px] outline-none text-slate-600" value="${item.link || ''}" onchange="updateData('${cat.k}', ${i}, 'link', this.value)" placeholder="URL"></div>
+                        <input class="w-full border-b mb-2 p-1 text-sm font-bold outline-none text-slate-800" value="${item.name}" onchange="updateData('${cat.k}', i, 'name', this.value)">
+                        <textarea class="w-full border-b mb-2 p-1 text-[10px] italic outline-none text-slate-600" onchange="updateData('${cat.k}', i, 'desc', this.value)">${item.desc || ''}</textarea>
+                        <div class="flex gap-2"><input class="w-1/2 border-b p-1 text-[10px] outline-none text-slate-600" value="${item.phone || ''}" onchange="updateData('${cat.k}', i, 'phone', this.value)" placeholder="Tel">
+                        <input class="w-1/2 border-b p-1 text-[10px] outline-none text-slate-600" value="${item.link || ''}" onchange="updateData('${cat.k}', i, 'link', this.value)" placeholder="URL"></div>
                     </div>`;
                 });
                 html += `<button onclick="addItem('${cat.k}')" class="w-full border-2 border-dashed border-slate-200 py-3 rounded-2xl text-slate-300 font-bold text-[10px] uppercase tracking-widest transition-colors hover:text-cyan-500 hover:border-cyan-200">+ AGREGAR ITEM</button></div></div>`;
@@ -340,7 +344,9 @@
             btn.disabled = true;
             try {
                 if (db) {
-                    await setDoc(doc(db, 'artifacts', currentAppId, 'public', 'data', 'siteConfig'), siteData);
+                    // FIX: Aseguramos que la ruta de guardado también tenga 6 segmentos
+                    const docRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'siteConfig', 'current');
+                    await setDoc(docRef, siteData);
                     alert("¡Guía actualizada en la nube!");
                 } else alert("Error de conexión. Verifique Firebase.");
                 closeAdminPanel();
@@ -423,7 +429,7 @@
             <div class="relative transform overflow-hidden rounded-[3rem] bg-white text-left shadow-2xl transition-all w-full max-w-xs border border-cyan-50">
                 <div class="bg-white px-6 pb-10 pt-12 text-center relative">
                     <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-cyan-100 to-emerald-50 rounded-b-[50%] -mt-10 opacity-40"></div>
-                    <div class="relative z-10 text-slate-700 text-center">
+                    <div class="relative z-10 text-slate-700 text-center text-slate-700 text-center">
                         <h3 class="text-xl font-black mb-1 italic uppercase text-slate-800" id="modal-contact-name">Nombre</h3>
                         <p class="text-2xl font-mono text-teal-800 font-black mb-10 italic" id="modal-contact-phone">0000000000</p>
                         <div class="space-y-3">
