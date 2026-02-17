@@ -3,540 +3,444 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bienvenido al PH3 - Club Náutico Teques</title>
-    <!-- Tailwind CSS -->
+    <title>PH3 - Guía Digital Tequesquitengo</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .accordion-content { transition: all 0.3s ease-in-out; max-height: 0; overflow: hidden; }
-        .accordion-content.open { max-height: 1000px; padding-bottom: 1.5rem; }
+        .accordion-content { transition: all 0.3s ease-in-out; max-height: 0; overflow: hidden; opacity: 0; }
+        .accordion-content.open { max-height: 2000px; opacity: 1; padding-bottom: 1.5rem; }
         .rotate-180 { transform: rotate(180deg); }
-        
-        /* Carrusel Horizontal */
-        .carousel-container {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            gap: 1rem;
-            padding: 0.5rem 0.25rem 1.5rem 0.25rem;
-            scrollbar-width: none;
-        }
+        .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 1rem; padding: 0.5rem 0.25rem 1.5rem 0.25rem; scrollbar-width: none; }
         .carousel-container::-webkit-scrollbar { display: none; }
-        .carousel-item {
-            flex: 0 0 85%;
-            scroll-snap-align: center;
-        }
-
-        .pulse-aqua {
-            animation: pulse-aqua-animation 2s infinite;
-        }
+        .carousel-item { flex: 0 0 85%; scroll-snap-align: center; }
+        .waves { position: relative; width: 100%; height: 60px; display: block; margin-top: -10px; }
+        .parallax > use { animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite; }
+        @keyframes move-forever { 0% { transform: translate3d(-90px,0,0); } 100% { transform: translate3d(85px,0,0); } }
+        
+        .admin-panel { display: none; position: fixed; inset: 0; background: white; z-index: 100; overflow-y: auto; }
+        .admin-panel.active { display: block; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
+        footer { margin-bottom: 0 !important; }
+        .pulse-aqua { animation: pulse-aqua-animation 2s infinite; }
         @keyframes pulse-aqua-animation {
-            0% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.6); }
-            70% { box-shadow: 0 0 0 12px rgba(20, 184, 166, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0); }
-        }
-
-        /* Ondas animadas del footer */
-        .waves {
-            position: relative;
-            width: 100%;
-            height: 60px;
-            display: block;
-        }
-        .parallax > use {
-            animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite;
-        }
-        .parallax > use:nth-child(1) { animation-delay: -2s; animation-duration: 7s; }
-        .parallax > use:nth-child(2) { animation-delay: -3s; animation-duration: 10s; }
-        @keyframes move-forever {
-            0% { transform: translate3d(-90px,0,0); }
-            100% { transform: translate3d(85px,0,0); }
+            0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.6); }
+            70% { box-shadow: 0 0 0 12px rgba(37, 211, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
         }
     </style>
 </head>
 <body class="bg-[#F0FDFD] text-slate-800 antialiased">
 
-    <div class="max-w-md mx-auto bg-white min-h-screen shadow-2xl overflow-hidden relative border-x border-cyan-50 flex flex-col">
-
-        <div class="flex-grow">
-            <!-- 1. HEADER -->
-            <header class="bg-gradient-to-br from-cyan-600 via-teal-500 to-emerald-500 text-white p-8 rounded-b-[3.5rem] shadow-xl text-center relative z-10">
-                <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/graphy.png')] rounded-b-[3.5rem]"></div>
-                <div class="relative">
-                    <p class="text-cyan-100 text-[10px] font-extrabold tracking-[0.3em] uppercase mb-2">Club Náutico Teques</p>
-                    <h1 class="text-3xl font-extrabold mb-6 tracking-tight text-white">PH3 Bienvenida</h1>
-
-                    <!-- Tarjeta WiFi -->
-                    <div class="bg-white/10 backdrop-blur-lg border border-white/30 rounded-3xl p-5 shadow-2xl">
-                        <div class="flex items-center justify-center mb-2">
-                            <i class="fa-solid fa-wifi text-xl mr-3 opacity-80 text-white"></i>
-                            <span class="font-bold text-lg tracking-wide uppercase text-white">Teques_wifi</span>
-                        </div>
-                        <div class="bg-white/95 text-teal-900 rounded-lg py-3 px-4 font-mono text-xl tracking-wider mb-4 shadow-inner border border-cyan-100 select-all">
-                            123456789
-                        </div>
-                        <button onclick="copyWifi()" id="wifiBtn" class="bg-white text-teal-600 font-extrabold py-3 px-6 rounded-2xl shadow-lg w-full active:scale-95 transition-all flex items-center justify-center gap-2">
-                            <i class="fa-regular fa-copy"></i> COPIAR CONTRASEÑA
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            <!-- 2. AIRBNB Y BOTONES RÁPIDOS -->
-            <div class="px-5 pt-8 space-y-3 relative z-20">
-                <a href="https://es-l.airbnb.com/rooms/1387534837636074286?viralityEntryPoint=1&s=76" target="_blank" class="w-full bg-[#FF385C] text-white p-5 rounded-[2rem] shadow-lg flex items-center justify-between active:scale-95 transition-transform group">
-                    <div class="flex items-center">
-                        <i class="fa-brands fa-airbnb text-3xl mr-4"></i>
-                        <div>
-                            <h3 class="font-black text-xs tracking-tight">MI ANUNCIO EN AIRBNB</h3>
-                            <p class="text-[9px] opacity-80 font-bold uppercase tracking-widest">Reseñas y Contacto</p>
-                        </div>
-                    </div>
-                    <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-50"></i>
-                </a>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="window.open('https://maps.app.goo.gl/oweNu9vusZ8gK31t7?g_st=ic', '_blank')" class="bg-white rounded-2xl p-4 shadow-md border border-cyan-50 flex flex-col items-center justify-center active:scale-95 transition-transform">
-                        <i class="fa-solid fa-location-arrow text-cyan-500 text-xl mb-1"></i>
-                        <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Llegada</span>
-                    </button>
-                    <button onclick="scrollToSection('check-out')" class="bg-white rounded-2xl p-4 shadow-md border border-cyan-50 flex flex-col items-center justify-center active:scale-95 transition-transform text-emerald-600">
-                        <i class="fa-solid fa-door-open text-xl mb-1"></i>
-                        <span class="text-[9px] font-black uppercase tracking-widest">Salida</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- 3. CONTENIDO PRINCIPAL -->
-            <div class="p-5 space-y-8">
-
-                <!-- ACORDEONES: INSTRUCCIONES -->
-                <section class="space-y-3">
-                    <!-- ACCESO Y CERRADURA -->
-                    <div class="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
-                        <button class="accordion-btn w-full px-6 py-5 flex justify-between items-center text-left" onclick="toggleAccordion(this)">
-                            <span class="font-extrabold text-slate-700 text-sm flex items-center tracking-tight">
-                                <i class="fa-solid fa-key mr-3 text-cyan-500"></i> Acceso y Cerradura
-                            </span>
-                            <i class="fa-solid fa-chevron-down text-slate-300 transition-transform duration-300"></i>
-                        </button>
-                        <div class="accordion-content px-6 text-xs space-y-4 bg-slate-50/20">
-                            <div class="grid grid-cols-2 gap-3 pt-4 text-slate-700">
-                                <div class="bg-white p-3 rounded-2xl border border-slate-100 text-center">
-                                    <span class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Cluster</span>
-                                    <span class="text-slate-700 font-black">12A</span>
-                                </div>
-                                <div class="bg-white p-3 rounded-2xl border border-slate-100 text-center">
-                                    <span class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Cajón Estac.</span>
-                                    <span class="text-slate-700 font-black">#23 (P3)</span>
-                                </div>
-                            </div>
-                            <div class="bg-white p-4 rounded-2xl border border-cyan-100 mb-4 shadow-inner">
-                                <p class="text-slate-600 leading-relaxed italic">
-                                    La <strong>Caja de Seguridad Gris</strong> se encuentra frente a la puerta del PH3. El código de acceso le será enviado por mensaje privado previo a su llegada. <br><br>
-                                    <strong>Pasos para entrar:</strong><br>
-                                    1. Toque la pantalla de la cerradura para activarla.<br>
-                                    2. Presione los 2 números que brillen aleatoriamente.<br>
-                                    3. Pase la tarjeta física (ubicada dentro de la caja gris) sobre el lector.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- REGLAS DE LA CASA -->
-                    <div class="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
-                        <button class="accordion-btn w-full px-6 py-5 flex justify-between items-center text-left" onclick="toggleAccordion(this)">
-                            <span class="font-extrabold text-slate-700 text-sm flex items-center tracking-tight">
-                                <i class="fa-solid fa-clipboard-check mr-3 text-red-400"></i> Reglas de la Casa
-                            </span>
-                            <i class="fa-solid fa-chevron-down text-slate-300 transition-transform duration-300"></i>
-                        </button>
-                        <div class="accordion-content px-6 text-[11px] border-t border-slate-50 bg-red-50/10">
-                            <div class="space-y-3 py-4 text-slate-700">
-                                <div class="flex items-center gap-3"><i class="fa-solid fa-ban text-red-500 w-5 text-center"></i> <span><strong>PROHIBIDO FIESTAS:</strong> Estancia exclusivamente familiar.</span></div>
-                                <div class="flex items-center gap-3"><i class="fa-solid fa-volume-xmark text-red-500 w-5 text-center"></i> <span><strong>HORARIO DE SILENCIO:</strong> Después de las 11:00 PM.</span></div>
-                                <div class="flex items-center gap-3"><i class="fa-solid fa-person-swimming text-cyan-500 w-5 text-center"></i> <span><strong>ALBERCA:</strong> 9:00 AM - 10:00 PM. Prohibido envases de vidrio y música.</span></div>
-                                <div class="flex items-center gap-3"><i class="fa-solid fa-snowflake text-cyan-500 w-5 text-center"></i> <span><strong>A/C:</strong> Por favor apague los aires al salir del departamento.</span></div>
-                                <div class="flex items-center gap-3"><i class="fa-solid fa-shrimp text-orange-500 w-5 text-center"></i> <span><strong>LIMPIEZA:</strong> Lave los trastes para evitar hormigas.</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- INSTRUCCIONES GENERALES -->
-                    <div class="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
-                        <button class="accordion-btn w-full px-6 py-5 flex justify-between items-center text-left" onclick="toggleAccordion(this)">
-                            <span class="font-extrabold text-slate-700 text-sm flex items-center tracking-tight">
-                                <i class="fa-solid fa-house-laptop mr-3 text-indigo-500"></i> Instrucciones de la Casa
-                            </span>
-                            <i class="fa-solid fa-chevron-down text-slate-300 transition-transform duration-300"></i>
-                        </button>
-                        <div class="accordion-content px-6 text-[11px] border-t border-slate-50 bg-indigo-50/10">
-                            <div class="space-y-4 pt-4 pb-2">
-                                <!-- Roku -->
-                                <div class="bg-indigo-600 text-white p-4 rounded-2xl shadow-sm">
-                                    <h5 class="font-black text-[10px] mb-2 uppercase tracking-widest italic text-white">TV Roku:</h5>
-                                    <p class="italic leading-relaxed text-[10px] text-white">
-                                        Encienda con el botón rojo <i class="fa-solid fa-power-off text-red-300"></i>. Use el botón Home <i class="fa-solid fa-house"></i> para ver las apps. El volumen está en el lateral derecho del control. <br>
-                                        <strong>Recuerde cerrar sus sesiones antes de irse.</strong>
-                                    </p>
-                                </div>
-                                <!-- Jacuzzi -->
-                                <div class="bg-cyan-600 text-white p-4 rounded-2xl shadow-sm">
-                                    <h5 class="font-black text-[10px] mb-2 uppercase tracking-widest italic text-white">Uso del Jacuzzi:</h5>
-                                    <p class="italic leading-relaxed text-[10px] text-white">
-                                        Para encender el sistema de burbujas, es <strong>obligatorio</strong> esperar a que el nivel del agua supere completamente la altura de los jets.
-                                    </p>
-                                </div>
-                                <!-- Boiler -->
-                                <p class="text-slate-600 italic px-1"><strong>Calentador:</strong> Es automático. Si por alguna razón falla el agua caliente, el equipo se encuentra en el segundo piso del depto.</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- CLUBES DE PLAYA -->
-                <section>
-                    <h3 class="text-[10px] font-black text-cyan-600 uppercase tracking-[0.3em] mb-4 pl-2 italic">Clubes de Playa</h3>
-                    <div class="carousel-container">
-                        <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-cyan-50 p-6 flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-center mb-4">
-                                    <h4 class="font-black text-cyan-900 text-lg italic uppercase tracking-tighter">Paradise</h4>
-                                    <i class="fa-solid fa-umbrella-beach text-cyan-500 text-2xl"></i>
-                                </div>
-                                <p class="text-[10px] opacity-70 mb-6 italic leading-relaxed text-slate-600">Excelente vista, alberca, bar y acceso directo al lago.</p>
-                            </div>
-                            <a href="https://share.google/YlpZUbnx8PZsF0HMq" target="_blank" class="w-full bg-cyan-600 text-white py-3 rounded-2xl font-black text-[10px] text-center tracking-widest uppercase shadow-md active:scale-95 transition-all">Ver en Maps</a>
-                        </div>
-                        <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-teal-50 p-6 flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-center mb-4">
-                                    <h4 class="font-black text-teal-900 text-lg italic uppercase tracking-tighter">Vikingos</h4>
-                                    <i class="fa-solid fa-ship text-teal-500 text-2xl"></i>
-                                </div>
-                                <p class="text-[10px] opacity-70 mb-6 italic leading-relaxed text-slate-600">Ambiente clásico, muy buena comida y excelente servicio.</p>
-                            </div>
-                            <a href="https://share.google/PEeBakGml2VYtPnoC" target="_blank" class="w-full bg-teal-600 text-white py-3 rounded-2xl font-black text-[10px] text-center tracking-widest uppercase shadow-md active:scale-95 transition-all text-white">Ver en Maps</a>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- RESTAURANTES -->
-                <section>
-                    <h3 class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em] mb-4 pl-2 italic text-emerald-600">Gastronomía</h3>
-                    <div class="carousel-container">
-                        <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-emerald-50 p-6 flex flex-col justify-between">
-                            <div class="flex justify-between items-start mb-4">
-                                <h4 class="font-black text-emerald-900 text-lg italic uppercase tracking-tighter">Jardines de México</h4>
-                                <i class="fa-solid fa-leaf text-emerald-500 text-xl text-emerald-500"></i>
-                            </div>
-                            <p class="text-[10px] opacity-60 italic mb-4 text-slate-600">Gastronomía nacional e internacional en un entorno espectacular.</p>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button onclick="openContactOptions('Rest. Jardines de México', '5541304269')" class="bg-emerald-50 text-emerald-700 py-3 rounded-xl font-black text-[9px] border border-emerald-100 active:scale-95 transition-all text-emerald-700">📞 LLAMAR</button>
-                                <a href="https://maps.app.goo.gl/FK7zsa6SMWEcigDb7?g_st=ic" target="_blank" class="bg-emerald-600 text-white py-3 rounded-xl font-black text-[9px] flex items-center justify-center active:scale-95 transition-all text-white">📍 MAPA</a>
-                            </div>
-                        </div>
-                        <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-cyan-50 p-6 flex flex-col justify-between">
-                            <div class="flex justify-between items-start mb-4">
-                                <h4 class="font-black text-cyan-900 text-lg italic uppercase tracking-tighter">Cangrejito Playero</h4>
-                                <i class="fa-solid fa-utensils text-cyan-500 text-xl text-cyan-500"></i>
-                            </div>
-                            <p class="text-[10px] opacity-60 italic mb-4 text-slate-600">Los mariscos más frescos y el mejor ambiente climatizado de Teques.</p>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button onclick="openContactOptions('Cangrejito Playero', '7346904525')" class="bg-cyan-50 text-cyan-700 py-3 rounded-xl font-black text-[9px] border border-cyan-100 active:scale-95 transition-all text-cyan-700">📞 LLAMAR</button>
-                                <a href="https://maps.app.goo.gl/B9Xqj2NSA98DB2K4A?g_st=ic" target="_blank" class="bg-cyan-600 text-white py-3 rounded-xl font-black text-[9px] flex items-center justify-center active:scale-95 transition-all text-white">📍 MAPA</a>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- AVENTURA EN EL LAGO -->
-                <section>
-                    <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em] mb-4 pl-2 italic text-blue-600">Aventura en el Lago</h3>
-                    <div class="carousel-container">
-                        <!-- Paracaidismo -->
-                        <div class="carousel-item bg-slate-900 rounded-[2.5rem] shadow-xl p-7 text-white flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-center mb-4">
-                                    <h4 class="font-black text-2xl tracking-tighter italic uppercase text-white">Paracaidismo</h4>
-                                    <i class="fa-solid fa-parachute-box text-red-500 text-2xl text-red-500"></i>
-                                </div>
-                                <p class="text-[10px] text-slate-400 italic mb-6 leading-relaxed">Vive la adrenalina máxima con un salto tándem a 17,000 pies sobre el impresionante lago de Tequesquitengo.</p>
-                            </div>
-                            <button onclick="openContactOptions('Paracaidismo Teques', '5540440422')" class="w-full bg-red-600 py-4 rounded-2xl font-black text-[10px] tracking-widest active:scale-95 transition-transform flex items-center justify-center gap-2 uppercase shadow-lg text-white">
-                                <i class="fa-solid fa-phone"></i> Reservar ahora
-                            </button>
-                        </div>
-                        <!-- Lanchas -->
-                        <div class="carousel-item bg-slate-900 rounded-[2.5rem] shadow-xl p-7 text-white flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-center mb-4">
-                                    <h4 class="font-black text-2xl tracking-tighter italic uppercase text-white">Lanchas</h4>
-                                    <i class="fa-solid fa-ship text-blue-400 text-2xl text-blue-400"></i>
-                                </div>
-                                <p class="text-[10px] text-slate-400 italic mb-6 leading-relaxed">Clases profesionales de esquí acuático, wakeboard, emocionantes paseos en dona y recorridos guiados con equipo de seguridad.</p>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button onclick="openContactOptions('Lanchas Contacto 1', '7341406030')" class="bg-blue-600 py-3.5 rounded-2xl font-black text-[10px] tracking-widest active:scale-95 transition-transform uppercase text-white">
-                                    <i class="fa-solid fa-phone text-white"></i> Contacto 1
-                                </button>
-                                <button onclick="openContactOptions('Lanchas Contacto 2', '7341027440')" class="bg-blue-600 py-3.5 rounded-2xl font-black text-[10px] tracking-widest active:scale-95 transition-transform uppercase text-white">
-                                    <i class="fa-solid fa-phone text-white"></i> Contacto 2
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- MÁS ACTIVIDADES -->
-                <section>
-                    <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em] mb-4 pl-2 italic text-indigo-600">Más Actividades</h3>
-                    <div class="carousel-container">
-                        <!-- Cuatrimotos -->
-                        <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-orange-100 p-6 flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-center mb-4">
-                                    <h4 class="font-black text-orange-900 text-lg italic uppercase tracking-tighter text-orange-900">Cuatrimotos y RZR</h4>
-                                    <i class="fa-solid fa-motorcycle text-orange-500 text-2xl text-orange-500"></i>
-                                </div>
-                                <p class="text-[10px] opacity-70 mb-6 italic leading-relaxed text-slate-600">Explora los alrededores de Teques en vehículos todo terreno. Una aventura llena de adrenalina por rutas todoterreno.</p>
-                            </div>
-                            <button onclick="openContactOptions('Cuatrimotos y RZR', '5591394024')" class="w-full bg-orange-600 text-white py-3 rounded-2xl font-black text-[10px] text-center tracking-widest uppercase shadow-md active:scale-95 transition-all text-white">
-                                📞 LLAMAR AHORA
-                            </button>
-                        </div>
-                        <!-- Padel -->
-                        <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-indigo-50 p-6 flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-center mb-4">
-                                    <h4 class="font-black text-indigo-900 text-lg italic uppercase tracking-tighter text-indigo-900">510 Padel Club</h4>
-                                    <i class="fa-solid fa-table-tennis-paddle-ball text-indigo-500 text-2xl text-indigo-500"></i>
-                                </div>
-                                <p class="text-[10px] opacity-70 mb-2 italic text-slate-600">Las mejores canchas de pádel con un excelente ambiente.</p>
-                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-4">Horario: 8AM - 10PM</p>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button onclick="openContactOptions('510 Padel Club', '7772574250')" class="bg-indigo-50 text-indigo-700 py-3 rounded-xl font-black text-[9px] text-indigo-700">📞 LLAMAR</button>
-                                <a href="https://maps.app.goo.gl/HcDoKo7KdiMgNVPfA" target="_blank" class="bg-indigo-600 text-white py-3 rounded-xl font-black text-[9px] flex items-center justify-center text-white active:scale-95 transition-all">📍 MAPA</a>
-                            </div>
-                        </div>
-                        <!-- Bungee -->
-                        <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-red-50 p-6 flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-center mb-4">
-                                    <h4 class="font-black text-red-900 text-lg italic uppercase tracking-tighter text-red-900">Bungee Jumping</h4>
-                                    <i class="fa-solid fa-person-falling text-red-500 text-2xl text-red-500"></i>
-                                </div>
-                                <p class="text-[10px] opacity-70 mb-6 italic leading-relaxed text-slate-600">Salta al vacío desde una plataforma a gran altura sobre el agua. ¡Adrenalina pura!</p>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button onclick="openContactOptions('Bungee Teques', '5525148067')" class="bg-red-50 text-red-700 py-3 rounded-xl font-black text-[9px] text-red-700">📞 LLAMAR</button>
-                                <a href="https://maps.app.goo.gl/QwSmewmQFmtLTuJY6" target="_blank" class="bg-red-600 text-white py-3 rounded-xl font-black text-[9px] flex items-center justify-center text-white active:scale-95 transition-all">📍 MAPA</a>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- SERVICIOS A DOMICILIO -->
-                <section>
-                    <div class="bg-white rounded-[2.5rem] border border-emerald-100 shadow-md p-6">
-                        <h4 class="text-[10px] font-black text-emerald-700 uppercase tracking-widest text-center mb-5 italic text-emerald-700 uppercase">Servicios y Pedidos</h4>
-                        
-                        <!-- Mandaditos -->
-                        <div class="mb-5">
-                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3 text-center">🛵 Mandaditos ($50 envío)</p>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button onclick="openContactOptions('Mandaditos 1', '7343460218')" class="bg-emerald-50 text-emerald-600 py-3 rounded-xl font-black text-[10px] text-emerald-600">📞 OPCIÓN 1</button>
-                                <button onclick="openContactOptions('Mandaditos 2', '7341878279')" class="bg-emerald-50 text-emerald-600 py-3 rounded-xl font-black text-[10px] text-emerald-600">📞 OPCIÓN 2</button>
-                            </div>
-                        </div>
-
-                        <!-- Comida Domicilio -->
-                        <div class="space-y-2 mb-5">
-                            <button onclick="openContactOptions('Pizza Crazy', '7343471343')" class="w-full bg-white p-3 rounded-xl border flex justify-between items-center text-xs text-slate-700">
-                                <span>🍕 Pizza & Tortas Crazy</span><i class="fa-solid fa-phone text-emerald-400"></i>
-                            </button>
-                            <button onclick="openContactOptions('Tacos Shadavi', '7341427747')" class="w-full bg-white p-3 rounded-xl border flex justify-between items-center text-xs text-slate-700">
-                                <span>🌮 Tacos Shadavi</span><i class="fa-solid fa-phone text-emerald-400"></i>
-                            </button>
-                            <button onclick="openContactOptions('Carne Asada (Congelada)', '7341180043')" class="w-full bg-white p-3 rounded-xl border flex justify-between items-center text-xs text-slate-700 font-bold">
-                                <span>🥩 Carne Asada (Congelada)</span><i class="fa-solid fa-phone text-orange-400"></i>
-                            </button>
-                        </div>
-
-                        <button onclick="openContactOptions('Taxi Seguro', '7343470734')" class="w-full bg-white p-4 rounded-xl border-2 border-cyan-100 flex justify-between items-center text-xs font-black text-cyan-700 tracking-tight active:scale-95 transition-transform text-cyan-700"><span>🚕 TAXIS SEGUROS</span><i class="fa-solid fa-phone text-cyan-500"></i></button>
-                    </div>
-                </section>
-
-                <!-- SUGERENCIAS -->
-                <section>
-                    <div class="bg-gradient-to-br from-cyan-600 via-teal-500 to-emerald-500 rounded-[3rem] p-8 text-white shadow-2xl relative overflow-hidden group">
-                        <div class="relative z-10 text-center text-white">
-                            <h3 class="text-2xl font-black mb-3 italic tracking-tighter uppercase">¿Descubriste algo genial?</h3>
-                            <p class="text-xs opacity-90 mb-6 leading-relaxed italic font-medium">Comparta sus descubrimientos favoritos para enriquecer nuestra guía.</p>
-                            <button onclick="shareDiscovery()" class="bg-white text-teal-700 font-black py-4 px-8 rounded-2xl shadow-xl w-full active:scale-95 transition-all flex items-center justify-center gap-2 border-b-4 border-cyan-100 uppercase text-[11px] tracking-widest">
-                                <i class="fa-solid fa-paper-plane text-teal-600"></i> Enviar Sugerencia
-                            </button>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- CHECK-OUT -->
-                <section id="check-out">
-                    <div class="bg-slate-900 rounded-[3rem] p-9 text-white shadow-2xl text-center border-b-8 border-emerald-500">
-                        <h3 class="text-xl font-black mb-3 uppercase tracking-[0.2em] italic text-white uppercase">Salida 12:00 PM</h3>
-                        <ul class="text-[10px] space-y-3 opacity-60 uppercase font-bold tracking-[0.3em] mb-8 text-white uppercase">
-                            <li>Apagar luces y A/C</li>
-                            <li>Llaves en caja de seguridad</li>
-                            <li>Cerrar caja y mezclar el código</li>
-                        </ul>
-                        <p class="text-emerald-400 font-black text-2xl italic animate-pulse tracking-tighter text-emerald-400">¡FELIZ VIAJE! 👋</p>
-                    </div>
-                </section>
-
-            </div>
-
-            <!-- 4. FOOTER (EMERGENCIAS Y ONDAS) -->
-            <footer class="bg-white pt-10 relative overflow-hidden border-t border-slate-50">
-                <div class="px-8 mb-12 relative z-20 text-center">
-                    <h3 class="text-[10px] font-black text-red-500 uppercase tracking-[0.5em] mb-8 italic text-red-500 uppercase">Emergencias</h3>
-                    <div class="grid grid-cols-3 gap-3">
-                        <button onclick="openContactOptions('Cruz Roja', '7343413301', 'https://maps.app.goo.gl/A6ADB9838fUmupkT9?g_st=ic', true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center shadow-sm active:scale-95 transition-all">
-                            <i class="fa-solid fa-truck-medical text-red-500 text-2xl mb-2"></i>
-                            <span class="text-[8px] font-black text-red-700 uppercase tracking-tighter">Cruz Roja</span>
-                        </button>
-                        <button onclick="openContactOptions('Bomberos', '7343423400', null, true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center shadow-sm active:scale-95 transition-all">
-                            <i class="fa-solid fa-fire-extinguisher text-red-500 text-2xl mb-2"></i>
-                            <span class="text-[8px] font-black text-red-700 uppercase tracking-tighter">Bomberos</span>
-                        </button>
-                        <button onclick="openContactOptions('Policía', '7343422696', null, true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center shadow-sm active:scale-95 transition-all">
-                            <i class="fa-solid fa-shield-halved text-red-500 text-2xl mb-2"></i>
-                            <span class="text-[8px] font-black text-red-700 uppercase tracking-tighter">Policía</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="relative text-center pb-2">
-                    <h2 class="text-2xl font-black tracking-[0.5em] text-cyan-400 uppercase italic">Tequesquitengo</h2>
-                    <p class="text-[9px] text-cyan-200 uppercase tracking-widest mt-1 font-extrabold italic">Morelos • México</p>
-                </div>
-                
-                <div class="relative leading-[0]">
-                    <svg class="waves" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
-                        <defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" /></defs>
-                        <g class="parallax">
-                            <use href="#gentle-wave" x="48" y="0" fill="rgba(6, 182, 212, 0.2)" />
-                            <use href="#gentle-wave" x="48" y="3" fill="rgba(20, 184, 166, 0.15)" />
-                        </g>
-                    </svg>
-                </div>
-            </footer>
+    <div id="app-content" class="max-w-md mx-auto bg-white min-h-screen shadow-2xl overflow-hidden relative border-x border-cyan-50 flex flex-col">
+        <!-- Loader Inicial -->
+        <div class="p-20 text-center text-cyan-600 flex flex-col items-center justify-center min-h-screen">
+            <i class="fa-solid fa-circle-notch animate-spin text-4xl mb-4 text-cyan-500"></i>
+            <p class="font-bold uppercase tracking-widest text-xs text-cyan-700">Sincronizando PH3...</p>
         </div>
-
-        <!-- BOTÓN FLOTANTE WHATSAPP -->
-        <a href="https://wa.me/525554317512" target="_blank" class="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white py-4 px-6 rounded-full shadow-2xl flex items-center gap-3 hover:bg-[#20bd5a] transition-all pulse-aqua border-2 border-white/30 backdrop-blur-md">
-            <i class="fa-brands fa-whatsapp text-2xl text-white"></i>
-            <span class="font-black text-sm tracking-tight uppercase text-white">AYUDA HOST</span>
-        </a>
-
-        <!-- MODAL DE CONTACTO -->
-        <div id="contactModal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-md transition-opacity" onclick="closeModal()"></div>
-            <div class="flex min-h-full items-center justify-center p-6 text-center">
-                <div class="relative transform overflow-hidden rounded-[3rem] bg-white text-left shadow-2xl transition-all w-full max-w-xs fade-in border border-cyan-50">
-                    <div class="bg-white px-6 pb-10 pt-12 text-center relative">
-                        <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-cyan-100 to-emerald-50 rounded-b-[50%] -mt-10"></div>
-                        <div class="relative z-10">
-                            <h3 class="text-xl font-black text-slate-800 mb-1 italic uppercase tracking-tighter" id="modal-contact-name">Nombre</h3>
-                            <p class="text-2xl font-mono text-teal-800 font-black tracking-widest mb-10 select-all italic text-teal-800" id="modal-contact-phone">0000000000</p>
-                            <div class="space-y-3">
-                                <a id="btn-call" href="#" class="flex w-full justify-center items-center rounded-2xl bg-slate-900 px-4 py-4 text-[11px] font-black text-white shadow-xl active:scale-95 transition-transform text-white uppercase tracking-widest">📞 LLAMAR AHORA</a>
-                                <a id="btn-whatsapp" href="#" target="_blank" class="flex w-full justify-center items-center rounded-2xl bg-[#25D366] px-4 py-4 text-[11px] font-black text-white shadow-xl italic active:scale-95 transition-transform text-white uppercase tracking-widest">WHATSAPP</a>
-                                <a id="btn-map" href="#" target="_blank" class="hidden w-full justify-center items-center rounded-2xl bg-cyan-600 px-4 py-4 text-[11px] font-black text-white shadow-xl active:scale-95 transition-transform text-white uppercase tracking-widest">📍 VER UBICACIÓN</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-slate-50 px-4 py-4 text-center"><button class="text-[10px] font-black text-slate-400 tracking-widest uppercase py-2 text-slate-400" onclick="closeModal()">Cerrar</button></div>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <script>
-        // Copiar WiFi
-        function copyWifi() {
-            const pass = '123456789';
-            navigator.clipboard.writeText(pass).then(() => {
-                const btn = document.getElementById('wifiBtn');
-                const orig = btn.innerHTML;
-                btn.innerHTML = '<span>¡COPIADA!</span>';
-                btn.classList.add('bg-emerald-500', 'text-white');
-                setTimeout(() => {
-                    btn.innerHTML = orig;
-                    btn.classList.remove('bg-emerald-500', 'text-white');
-                }, 2000);
+    <!-- MODAL DE CONTRASEÑA ADMIN -->
+    <div id="password-modal" class="fixed inset-0 z-[120] hidden">
+        <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closePasswordModal()"></div>
+        <div class="flex min-h-full items-center justify-center p-6">
+            <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-xs shadow-2xl relative text-center">
+                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+                    <i class="fa-solid fa-lock text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-black text-slate-800 mb-2 uppercase italic tracking-tighter">Acceso Restringido</h3>
+                <p class="text-xs text-slate-500 mb-6">Ingresa la clave para editar la guía</p>
+                <input type="password" id="admin-pass-input" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 px-6 text-center text-xl font-black tracking-[0.5em] outline-none focus:border-cyan-500 transition-all mb-4" placeholder="••••">
+                <button onclick="checkAdminPassword()" class="w-full bg-slate-800 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest active:scale-95 transition-all">Entrar</button>
+                <p id="pass-error" class="text-red-500 text-[10px] font-bold mt-3 hidden uppercase italic">Contraseña incorrecta</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEL DE ADMINISTRACIÓN -->
+    <div id="admin-panel" class="admin-panel p-6">
+        <div class="flex justify-between items-center mb-8 border-b pb-4">
+            <h2 class="text-2xl font-black text-slate-800 italic uppercase tracking-tighter">Panel de Control</h2>
+            <button onclick="closeAdminPanel()" class="bg-slate-100 p-3 rounded-full text-slate-500 active:scale-90 transition-transform"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div id="admin-editor" class="space-y-8 pb-32 text-slate-700">
+            <!-- Los formularios se generan dinámicamente -->
+        </div>
+
+        <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t flex gap-2 max-w-md mx-auto z-[110]">
+            <button onclick="saveChanges()" id="saveBtn" class="flex-grow bg-emerald-600 text-white py-4 rounded-2xl font-black shadow-lg active:scale-95 transition-all uppercase tracking-widest text-xs">
+                GUARDAR CAMBIOS EN LA NUBE
+            </button>
+        </div>
+    </div>
+
+    <!-- BOTÓN ACCESO ADMIN (DISCRETO) -->
+    <button onclick="requestAdminAccess()" class="fixed bottom-4 left-4 z-40 opacity-10 hover:opacity-100 bg-slate-800 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all">
+        <i class="fa-solid fa-gear"></i>
+    </button>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // --- TU CONFIGURACIÓN DE FIREBASE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1u6Bz1PsjPUuczQ6ZjvYaQVCxUbWdj9Q",
+            authDomain: "airbnb-e780c.firebaseapp.com",
+            projectId: "airbnb-e780c",
+            storageBucket: "airbnb-e780c.firebasestorage.app",
+            messagingSenderId: "459942265651",
+            appId: "1:459942265651:web:9ecd9c2e1c92804053f446"
+        };
+
+        const currentAppId = 'ph3-teques-live';
+        const ADMIN_PASSWORD = "1234"; // CAMBIA TU CONTRASEÑA AQUÍ
+
+        let db, auth, siteData;
+
+        // DATOS MAESTROS DE RESPALDO
+        siteData = {
+            clubs: [
+                { id: 1, name: 'Paradise', desc: 'Excelente vista, alberca, bar y acceso directo al lago.', link: 'https://share.google/YlpZUbnx8PZsF0HMq', icon: 'fa-umbrella-beach' },
+                { id: 2, name: 'Vikingos', desc: 'Ambiente clásico, muy buena comida y excelente servicio.', link: 'https://share.google/PEeBakGml2VYtPnoC', icon: 'fa-ship' }
+            ],
+            restaurants: [
+                { id: 1, name: 'Jardines de México', desc: 'Gastronomía de alto nivel en un entorno natural.', phone: '5541304269', link: 'https://maps.app.goo.gl/FK7zsa6SMWEcigDb7' },
+                { id: 2, name: 'Cangrejito Playero', desc: 'Los mariscos más frescos y ambiente climatizado.', phone: '7346904525', link: 'https://maps.app.goo.gl/B9Xqj2NSA98DB2K4A' }
+            ],
+            adventure: [
+                { id: 1, name: 'Paracaidismo', desc: 'Vive la adrenalina máxima con un salto tándem a 17,000 pies sobre el lago.', phone: '5540440422', icon: 'fa-parachute-box' },
+                { id: 2, name: 'Lanchas', desc: 'Clases de esquí, wakeboard, paseos en dona y recorridos guiados.', phone: '7341406030', icon: 'fa-ship' }
+            ],
+            extra: [
+                { id: 1, name: 'Cuatrimotos y RZR', desc: 'Explora los alrededores de Teques en vehículos todo terreno.', phone: '5591394024', icon: 'fa-motorcycle' },
+                { id: 2, name: '510 Padel Club', desc: 'Canchas profesionales. Horario: 8AM-10PM', phone: '7772574250', link: 'https://maps.app.goo.gl/HcDoKo7KdiMgNVPfA', icon: 'fa-table-tennis-paddle-ball' },
+                { id: 3, name: 'Bungee Jumping', desc: 'Salta al vacío desde una plataforma sobre el agua.', phone: '5525148067', link: 'https://maps.app.goo.gl/QwSmewmQFmtLTuJY6', icon: 'fa-person-falling' }
+            ],
+            delivery: [
+                { id: 1, name: 'Pizza & Tortas Crazy', phone: '7343471343' },
+                { id: 2, name: 'Tacos Shadavi', phone: '7341427747' },
+                { id: 3, name: 'Carne Asada (Congelada)', phone: '7341180043' }
+            ]
+        };
+
+        async function init() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                await signInAnonymously(auth);
+
+                const docRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'siteConfig');
+                onSnapshot(docRef, (docSnap) => {
+                    if (docSnap.exists()) siteData = docSnap.data();
+                    else setDoc(docRef, siteData);
+                    renderApp();
+                }, (err) => {
+                    console.warn("Usando local:", err);
+                    renderApp();
+                });
+            } catch (e) {
+                renderApp();
+            }
+        }
+
+        function renderApp() {
+            const container = document.getElementById('app-content');
+            container.innerHTML = `
+                <div class="flex-grow">
+                    <header class="bg-gradient-to-br from-cyan-600 via-teal-500 to-emerald-500 text-white p-8 rounded-b-[3.5rem] shadow-xl text-center relative z-10">
+                        <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/graphy.png')] rounded-b-[3.5rem]"></div>
+                        <div class="relative">
+                            <p class="text-cyan-100 text-[10px] font-extrabold tracking-[0.3em] uppercase mb-2">Club Náutico Teques</p>
+                            <h1 class="text-3xl font-extrabold mb-6 tracking-tight text-white">PH3 Bienvenida</h1>
+                            <div class="bg-white/10 backdrop-blur-lg border border-white/30 rounded-3xl p-5 shadow-2xl">
+                                <div class="flex items-center justify-center mb-2"><i class="fa-solid fa-wifi text-xl mr-3 opacity-80 text-white"></i><span class="font-bold text-lg uppercase text-white">Teques_wifi</span></div>
+                                <div class="bg-white/95 text-teal-900 rounded-lg py-3 px-4 font-mono text-xl tracking-wider mb-4 shadow-inner border border-cyan-50">123456789</div>
+                                <button onclick="copyWifi()" id="wifiBtn" class="bg-white text-teal-600 font-extrabold py-3 px-6 rounded-2xl shadow-lg w-full active:scale-95 transition-all flex items-center justify-center gap-2">
+                                    <i class="fa-regular fa-copy"></i> COPIAR CONTRASEÑA
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div class="px-5 pt-8 space-y-3 relative z-20">
+                        <a href="https://es-l.airbnb.com/rooms/1387534837636074286?viralityEntryPoint=1&s=76" target="_blank" class="w-full bg-[#FF385C] text-white p-5 rounded-[2rem] shadow-lg flex items-center justify-between active:scale-95 transition-transform group text-white">
+                            <div class="flex items-center"><i class="fa-brands fa-airbnb text-3xl mr-4 text-white"></i><div><h3 class="font-black text-xs text-white uppercase tracking-tighter">Mi Anuncio en Airbnb</h3><p class="text-[9px] opacity-80 font-bold uppercase tracking-widest text-white">Reseñas y Contacto</p></div></div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs text-white"></i>
+                        </a>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="window.open('https://maps.app.goo.gl/oweNu9vusZ8gK31t7', '_blank')" class="bg-white rounded-2xl p-4 shadow-md border border-cyan-50 flex flex-col items-center active:scale-95 transition-transform"><i class="fa-solid fa-location-arrow text-cyan-500 text-xl mb-1"></i><span class="text-[9px] font-black text-slate-500 uppercase tracking-widest uppercase">Llegada</span></button>
+                            <button onclick="scrollToSection('check-out')" class="bg-white rounded-2xl p-4 shadow-md border border-cyan-50 flex flex-col items-center text-emerald-600 active:scale-95 transition-transform"><i class="fa-solid fa-door-open text-xl mb-1"></i><span class="text-[9px] font-black uppercase text-emerald-600 tracking-widest uppercase">Salida</span></button>
+                        </div>
+                    </div>
+
+                    <div class="p-5 space-y-8">
+                        <section class="space-y-3">
+                            ${renderAccordion('Acceso y Cerradura', 'fa-key', 'cyan', `
+                                <div class="grid grid-cols-2 gap-3 pt-4 text-slate-700">
+                                    <div class="bg-white p-3 rounded-2xl border border-slate-100 text-center shadow-sm"><span class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Cluster</span><span class="text-slate-700 font-black">12A</span></div>
+                                    <div class="bg-white p-3 rounded-2xl border border-slate-100 text-center shadow-sm"><span class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Cajón Estac.</span><span class="text-slate-700 font-black">#23 (P3)</span></div>
+                                </div>
+                                <div class="bg-white p-4 rounded-2xl border border-cyan-100 mb-4 shadow-inner text-[11px] text-slate-600 italic leading-relaxed">
+                                    La <strong>Caja de Seguridad Gris</strong> está frente a la puerta del PH3. El código se envía por mensaje privado antes de su check-in.<br><br>
+                                    1. Toca pantalla para activar. 2. Presiona números que brillen. 3. Pasa la tarjeta física.
+                                </div>
+                            `)}
+                            ${renderAccordion('Reglas de la Casa', 'fa-clipboard-check', 'red', `
+                                <div class="space-y-3 py-4 text-[11px] text-slate-700 italic">
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-ban text-red-500 w-5 text-center"></i> <span><strong>PROHIBIDO FIESTAS:</strong> Estancia exclusivamente familiar.</span></div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-volume-xmark text-red-500 w-5 text-center"></i> <span><strong>HORARIO SILENCIO:</strong> Después de las 11:00 PM.</span></div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-snowflake text-cyan-500 w-5 text-center"></i> <span><strong>A/C:</strong> Apague los aires si sale del departamento.</span></div>
+                                    <div class="flex items-center gap-3"><i class="fa-solid fa-sink text-emerald-500 w-5 text-center"></i> <span><strong>LIMPIEZA:</strong> Lave los trastes para evitar hormigas.</span></div>
+                                </div>
+                            `)}
+                            ${renderAccordion('Instrucciones Generales', 'fa-house-laptop', 'indigo', `
+                                <div class="space-y-4 pt-4 pb-2">
+                                    <div class="bg-cyan-600 text-white p-4 rounded-2xl shadow-lg"><h5 class="font-black text-[10px] uppercase italic mb-2 text-white">Uso del Jacuzzi:</h5><p class="italic text-[10px] text-white">Para encender las burbujas, el agua DEBE superar el nivel de los jets para no dañar el motor.</p></div>
+                                    <div class="bg-indigo-600 text-white p-4 rounded-2xl shadow-lg"><h5 class="font-black text-[10px] uppercase italic mb-2 text-white">TV Roku:</h5><p class="italic text-[10px] text-white">Encendido botón rojo. Home para ver apps. Por favor cierre sesiones al salir.</p></div>
+                                </div>
+                            `)}
+                        </section>
+
+                        <section>
+                            <h3 class="text-[10px] font-black text-cyan-600 uppercase tracking-[0.3em] mb-4 pl-2 italic">Clubes de Playa</h3>
+                            <div class="carousel-container">${siteData.clubs.map(c => `
+                                <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-cyan-50 p-6 flex flex-col justify-between">
+                                    <div><div class="flex justify-between items-center mb-4"><h4 class="font-black text-cyan-900 text-lg italic uppercase tracking-tighter">${c.name}</h4><i class="fa-solid ${c.icon} text-cyan-500 text-2xl"></i></div><p class="text-[10px] opacity-70 mb-6 italic text-slate-600 leading-relaxed">${c.desc}</p></div>
+                                    <a href="${c.link}" target="_blank" class="w-full bg-cyan-600 text-white py-3 rounded-2xl font-black text-[10px] text-center tracking-widest uppercase active:scale-95 shadow-lg shadow-cyan-100 text-white">Ver en Maps</a>
+                                </div>`).join('')}</div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em] mb-4 pl-2 italic">Gastronomía</h3>
+                            <div class="carousel-container">${siteData.restaurants.map(r => `
+                                <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-emerald-50 p-6 flex flex-col justify-between">
+                                    <div class="flex justify-between items-start mb-4 text-emerald-900"><h4 class="font-black text-lg italic uppercase tracking-tighter">${r.name}</h4><i class="fa-solid fa-utensils text-emerald-500 text-xl"></i></div>
+                                    <p class="text-[10px] opacity-60 italic mb-4 text-slate-600">${r.desc}</p>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button onclick="openContactOptions('${r.name}', '${r.phone}')" class="bg-emerald-50 text-emerald-700 py-3 rounded-xl font-black text-[9px] border border-emerald-100 active:scale-95 text-emerald-700">LLAMAR</button>
+                                        <a href="${r.link}" target="_blank" class="bg-emerald-600 text-white py-3 rounded-xl font-black text-[9px] flex items-center justify-center active:scale-95 text-white">📍 MAPA</a>
+                                    </div>
+                                </div>`).join('')}</div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em] mb-4 pl-2 italic">Aventura</h3>
+                            <div class="carousel-container">${siteData.adventure.map(a => `
+                                <div class="carousel-item bg-slate-900 rounded-[2.5rem] shadow-xl p-7 text-white flex flex-col justify-between">
+                                    <div><div class="flex justify-between items-center mb-4 text-white"><h4 class="font-black text-2xl tracking-tighter italic uppercase text-white">${a.name}</h4><i class="fa-solid ${a.icon || 'fa-ship'} text-blue-400 text-2xl text-blue-400"></i></div><p class="text-[10px] text-slate-400 italic mb-6 leading-relaxed">${a.desc}</p></div>
+                                    <button onclick="openContactOptions('${a.name}', '${a.phone}')" class="w-full bg-blue-600 py-4 rounded-2xl font-black text-[10px] tracking-widest active:scale-95 text-white uppercase shadow-lg shadow-blue-900/20 text-white">📞 Reservar Ahora</button>
+                                </div>`).join('')}</div>
+                        </section>
+
+                        <section>
+                            <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em] mb-4 pl-2 italic">Más Actividades</h3>
+                            <div class="carousel-container">${siteData.extra.map(x => `
+                                <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-indigo-50 p-6 flex flex-col justify-between">
+                                    <div><div class="flex justify-between items-center mb-4 text-indigo-900"><h4 class="font-black text-lg italic uppercase text-indigo-900">${x.name}</h4><i class="fa-solid ${x.icon || 'fa-star'} text-indigo-500 text-2xl text-indigo-500"></i></div><p class="text-[10px] opacity-70 mb-6 italic text-slate-600 leading-relaxed">${x.desc}</p></div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button onclick="openContactOptions('${x.name}', '${x.phone}')" class="bg-indigo-50 text-indigo-700 py-3 rounded-xl font-black text-[9px] active:scale-95 text-indigo-700">LLAMAR</button>
+                                        ${x.link ? `<a href="${x.link}" target="_blank" class="bg-indigo-600 text-white py-3 rounded-xl font-black text-[9px] flex items-center justify-center text-white active:scale-95">📍 MAPA</a>` : `<span></span>`}
+                                    </div>
+                                </div>`).join('')}</div>
+                        </section>
+
+                        <section>
+                            <div class="bg-white rounded-[2.5rem] border border-emerald-100 shadow-md p-6 text-slate-700 text-center">
+                                <h4 class="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-5 italic">Pedidos y Servicios</h4>
+                                <div class="space-y-2 mb-5">${siteData.delivery.map(d => `
+                                    <button onclick="openContactOptions('${d.name}', '${d.phone}')" class="w-full bg-white p-3 rounded-xl border flex justify-between items-center text-xs text-slate-700 italic active:bg-slate-50">
+                                        <span>${d.name}</span><i class="fa-solid fa-phone text-emerald-400"></i>
+                                    </button>`).join('')}
+                                </div>
+                                <button onclick="openContactOptions('Taxi Seguro', '7343470734')" class="w-full bg-white p-4 rounded-xl border-2 border-cyan-100 flex justify-between items-center text-xs font-black text-cyan-700 active:scale-95 transition-transform text-cyan-700 uppercase italic"><span>🚕 Taxis Seguros</span><i class="fa-solid fa-phone"></i></button>
+                            </div>
+                        </section>
+
+                        <section id="check-out">
+                            <div class="bg-slate-900 rounded-[3rem] p-9 text-white shadow-2xl text-center border-b-8 border-emerald-500">
+                                <h3 class="text-xl font-black mb-3 uppercase tracking-[0.2em] italic text-white uppercase tracking-widest">Salida 12:00 PM</h3>
+                                <ul class="text-[10px] space-y-3 opacity-60 uppercase font-bold tracking-[0.3em] mb-8 text-white italic">
+                                    <li>Apagar luces y A/C</li>
+                                    <li>Llaves en caja de seguridad</li>
+                                    <li>Cerrar caja y mezclar el código</li>
+                                </ul>
+                                <p class="text-emerald-400 font-black text-2xl italic animate-pulse text-emerald-400 uppercase">¡Feliz Viaje! 👋</p>
+                            </div>
+                        </section>
+                    </div>
+
+                    <footer class="bg-white pt-10 pb-0 relative overflow-hidden border-t border-slate-50 text-center">
+                        <div class="px-8 mb-12 relative z-20 text-red-500">
+                            <h3 class="text-[10px] font-black uppercase tracking-[0.5em] mb-8 italic text-red-500 uppercase">Emergencias</h3>
+                            <div class="grid grid-cols-3 gap-3">
+                                <button onclick="openContactOptions('Cruz Roja', '7343413301', 'https://maps.app.goo.gl/A6ADB9838fUmupkT9', true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700"><i class="fa-solid fa-truck-medical text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter">Cruz Roja</span></button>
+                                <button onclick="openContactOptions('Bomberos', '7343423400', null, true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700"><i class="fa-solid fa-fire-extinguisher text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter">Bomberos</span></button>
+                                <button onclick="openContactOptions('Policía', '7343422696', null, true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700"><i class="fa-solid fa-shield-halved text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter">Policía</span></button>
+                            </div>
+                        </div>
+                        <h2 class="text-2xl font-black tracking-[0.5em] text-cyan-400 uppercase italic pb-2">Tequesquitengo</h2>
+                        <div class="relative leading-[0]"><svg class="waves" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none"><defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" /></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0" fill="rgba(6, 182, 212, 0.2)" /><use href="#gentle-wave" x="48" y="3" fill="rgba(20, 184, 166, 0.15)" /></g></svg></div>
+                    </footer>
+                </div>`;
+            renderAdminForms();
+        }
+
+        function renderAccordion(title, icon, color, content) {
+            return `<div class="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
+                <button onclick="toggleAccordion(this)" class="w-full px-6 py-5 flex justify-between items-center text-left active:bg-slate-50 transition-colors">
+                    <span class="font-extrabold text-slate-700 text-sm flex items-center italic tracking-tight text-slate-700"><i class="fa-solid ${icon} mr-3 text-${color}-500 opacity-60"></i> ${title}</span>
+                    <i class="fa-solid fa-chevron-down text-slate-300 transition-transform"></i>
+                </button>
+                <div class="accordion-content px-6">${content}</div>
+            </div>`;
+        }
+
+        function renderAdminForms() {
+            const editor = document.getElementById('admin-editor');
+            if(!editor) return;
+            editor.innerHTML = '';
+            const cats = [
+                { k: 'clubs', l: 'Clubes de Playa' },
+                { k: 'restaurants', l: 'Restaurantes' },
+                { k: 'adventure', l: 'Aventura' },
+                { k: 'extra', l: 'Más Actividades' },
+                { k: 'delivery', l: 'Servicios' }
+            ];
+            cats.forEach(cat => {
+                let html = `<div class="bg-slate-50 p-4 rounded-3xl mb-4 text-slate-700 shadow-inner"><h3 class="text-xs font-black mb-4 uppercase tracking-widest text-slate-400 italic">${cat.l}</h3><div class="space-y-4">`;
+                siteData[cat.k].forEach((item, i) => {
+                    html += `<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative text-slate-700">
+                        <button onclick="deleteItem('${cat.k}', ${i})" class="absolute top-2 right-2 text-red-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+                        <input class="w-full border-b mb-2 p-1 text-sm font-bold outline-none text-slate-800" value="${item.name}" onchange="updateData('${cat.k}', ${i}, 'name', this.value)">
+                        <textarea class="w-full border-b mb-2 p-1 text-[10px] italic outline-none text-slate-600" onchange="updateData('${cat.k}', ${i}, 'desc', this.value)">${item.desc || ''}</textarea>
+                        <div class="flex gap-2"><input class="w-1/2 border-b p-1 text-[10px] outline-none text-slate-600" value="${item.phone || ''}" onchange="updateData('${cat.k}', ${i}, 'phone', this.value)" placeholder="Tel">
+                        <input class="w-1/2 border-b p-1 text-[10px] outline-none text-slate-600" value="${item.link || ''}" onchange="updateData('${cat.k}', ${i}, 'link', this.value)" placeholder="URL"></div>
+                    </div>`;
+                });
+                html += `<button onclick="addItem('${cat.k}')" class="w-full border-2 border-dashed border-slate-200 py-3 rounded-2xl text-slate-300 font-bold text-[10px] uppercase tracking-widest transition-colors hover:text-cyan-500 hover:border-cyan-200">+ AGREGAR ITEM</button></div></div>`;
+                editor.innerHTML += html;
             });
         }
 
-        // Acordeones
-        function toggleAccordion(btn) {
+        window.updateData = (cat, i, field, val) => { siteData[cat][i][field] = val; };
+        window.addItem = (cat) => { siteData[cat].push({ name: 'Nuevo Item', desc: '', phone: '', link: '', icon: 'fa-star' }); renderAdminForms(); };
+        window.deleteItem = (cat, i) => { siteData[cat].splice(i, 1); renderAdminForms(); };
+        
+        window.saveChanges = async () => {
+            const btn = document.getElementById('saveBtn');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin mr-2"></i> SINCRONIZANDO...';
+            btn.disabled = true;
+            try {
+                if (db) {
+                    await setDoc(doc(db, 'artifacts', currentAppId, 'public', 'data', 'siteConfig'), siteData);
+                    alert("¡Guía actualizada en la nube!");
+                } else alert("Error de conexión. Verifique Firebase.");
+                closeAdminPanel();
+            } catch (e) { alert("Error al guardar: " + e.message); }
+            btn.innerHTML = 'Guardar Cambios'; btn.disabled = false; renderApp();
+        };
+
+        // --- LÓGICA DE SEGURIDAD ADMIN ---
+        window.requestAdminAccess = () => {
+            document.getElementById('admin-pass-input').value = "";
+            document.getElementById('pass-error').classList.add('hidden');
+            document.getElementById('password-modal').classList.remove('hidden');
+            document.getElementById('admin-pass-input').focus();
+        };
+
+        window.closePasswordModal = () => {
+            document.getElementById('password-modal').classList.add('hidden');
+        };
+
+        window.checkAdminPassword = () => {
+            const input = document.getElementById('admin-pass-input').value;
+            if (input === ADMIN_PASSWORD) {
+                closePasswordModal();
+                document.getElementById('admin-panel').classList.add('active');
+            } else {
+                document.getElementById('pass-error').classList.remove('hidden');
+                document.getElementById('admin-pass-input').value = "";
+            }
+        };
+
+        window.closeAdminPanel = () => {
+            document.getElementById('admin-panel').classList.remove('active');
+        };
+
+        window.toggleAccordion = (btn) => {
             const content = btn.nextElementSibling;
             const icon = btn.querySelector('.fa-chevron-down');
             content.classList.toggle('open');
-            content.classList.toggle('hidden');
             if (icon) icon.classList.toggle('rotate-180');
-        }
-
-        // Scroll
-        function scrollToSection(id) {
-            const el = document.getElementById(id);
-            if(el) el.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Modal Contacto
-        function openContactOptions(name, phone, mapUrl = null, isEmergency = false) {
+        };
+        window.copyWifi = () => {
+            navigator.clipboard.writeText('123456789');
+            const btn = document.getElementById('wifiBtn');
+            btn.innerHTML = '<span>¡COPIADA!</span>';
+            setTimeout(() => { renderApp(); }, 2000);
+        };
+        window.scrollToSection = (id) => document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        window.openContactOptions = (name, phone, mapUrl = null, isEmergency = false) => {
+            const modal = document.getElementById('contactModal');
             document.getElementById('modal-contact-name').innerText = name;
             document.getElementById('modal-contact-phone').innerText = phone;
             document.getElementById('btn-call').href = `tel:${phone}`;
-            
-            const cleanPhone = phone.replace(/\D/g, '');
             const waBtn = document.getElementById('btn-whatsapp');
-            
-            if (isEmergency) {
-                waBtn.classList.add('hidden');
-            } else {
-                waBtn.classList.remove('hidden');
-                waBtn.href = `https://wa.me/52${cleanPhone}`;
-            }
-            
+            if (isEmergency) waBtn.classList.add('hidden');
+            else { waBtn.classList.remove('hidden'); waBtn.href = `https://wa.me/52${phone.replace(/\D/g, '')}`; }
             const mapBtn = document.getElementById('btn-map');
-            if (mapUrl) {
-                mapBtn.href = mapUrl;
-                mapBtn.classList.replace('hidden', 'flex');
-            } else {
-                mapBtn.classList.replace('flex', 'hidden');
+            if (mapUrl) { mapBtn.href = mapUrl; mapBtn.classList.remove('hidden'); mapBtn.classList.add('flex'); }
+            else mapBtn.classList.add('hidden');
+            modal.classList.remove('hidden');
+        };
+        window.closeModal = () => document.getElementById('contactModal').classList.add('hidden');
+        window.shareDiscovery = () => {
+            const template = `¡Hola! Descubrí algo increíble en Teques que quiero recomendar para futuros huéspedes:\n\n📍 Nombre:\n✨ Recomendación:`;
+            window.location.assign(`https://wa.me/525554317512?text=${encodeURIComponent(template)}`);
+        };
+
+        // Escuchar "Enter" en el input de contraseña
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !document.getElementById('password-modal').classList.contains('hidden')) {
+                checkAdminPassword();
             }
-            
-            document.getElementById('contactModal').classList.remove('hidden');
-        }
+        });
 
-        function closeModal() {
-            document.getElementById('contactModal').classList.add('hidden');
-        }
-
-        // Sugerencia
-        function shareDiscovery() {
-            const template = `¡Hola! Descubrí algo increíble en Teques que quiero recomendar para futuros huéspedes:\n\n📍 Nombre:\n🗺️ Ubicación/Maps:\n✨ ¿Por qué lo recomiendas?:\n📞 Contacto:`;
-            const message = encodeURIComponent(template);
-            const waLink = `https://wa.me/525554317512?text=${message}`;
-            window.location.assign(waLink);
-        }
+        init();
     </script>
+
+    <div id="contactModal" class="fixed inset-0 z-[100] hidden">
+        <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeModal()"></div>
+        <div class="flex min-h-full items-center justify-center p-6 text-center text-slate-700">
+            <div class="relative transform overflow-hidden rounded-[3rem] bg-white text-left shadow-2xl transition-all w-full max-w-xs border border-cyan-50">
+                <div class="bg-white px-6 pb-10 pt-12 text-center relative">
+                    <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-cyan-100 to-emerald-50 rounded-b-[50%] -mt-10 opacity-40"></div>
+                    <div class="relative z-10 text-slate-700 text-center">
+                        <h3 class="text-xl font-black mb-1 italic uppercase text-slate-800" id="modal-contact-name">Nombre</h3>
+                        <p class="text-2xl font-mono text-teal-800 font-black mb-10 italic" id="modal-contact-phone">0000000000</p>
+                        <div class="space-y-3">
+                            <a id="btn-call" href="#" class="flex w-full justify-center items-center rounded-2xl bg-slate-900 px-4 py-4 text-[11px] font-black text-white shadow-xl uppercase tracking-widest text-white transition-transform">📞 LLAMAR</a>
+                            <a id="btn-whatsapp" href="#" target="_blank" class="flex w-full justify-center items-center rounded-2xl bg-[#25D366] py-4 text-[11px] font-black text-white shadow-xl italic text-white transition-transform">WHATSAPP</a>
+                            <a id="btn-map" href="#" target="_blank" class="hidden w-full justify-center items-center rounded-2xl bg-cyan-600 px-4 py-4 text-[11px] font-black text-white shadow-xl text-white uppercase transition-transform">📍 MAPA</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 px-4 py-4 text-center"><button class="text-[10px] font-black text-slate-400 tracking-widest uppercase" onclick="closeModal()">Cerrar</button></div>
+            </div>
+        </div>
+    </div>
+
+    <a href="https://wa.me/525554317512" target="_blank" class="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white py-4 px-6 rounded-full shadow-2xl flex items-center gap-3 hover:bg-[#20bd5a] transition-all pulse-aqua border-2 border-white/30 text-white">
+        <i class="fa-brands fa-whatsapp text-2xl"></i>
+        <span class="font-black text-xs tracking-tight uppercase">AYUDA HOST</span>
+    </a>
 </body>
 </html>
