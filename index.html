@@ -119,7 +119,7 @@
                 { id: 2, name: 'Lanchas', desc: 'Clases de esquí, wakeboard, paseos en dona y recorridos guiados.', phone: '7341406030', icon: 'fa-ship' }
             ],
             extra: [
-                { id: 1, name: 'Cuatrimotos y RZR', desc: 'Explora los alrededores de Teques en vehículos todo terreno.', phone: '5591394024', icon: 'fa-motorcycle' },
+                { id: 1, name: 'Cuatrimotos y RZR', desc: 'Explora los alrededores en vehículos todo terreno.', phone: '5591394024', icon: 'fa-motorcycle' },
                 { id: 2, name: '510 Padel Club', desc: 'Canchas profesionales. Horario: 8AM-10PM', phone: '7772574250', link: 'https://maps.app.goo.gl/HcDoKo7KdiMgNVPfA', icon: 'fa-table-tennis-paddle-ball' },
                 { id: 3, name: 'Bungee Jumping', desc: 'Salta al vacío desde una plataforma sobre el agua.', phone: '5525148067', link: 'https://maps.app.goo.gl/QwSmewmQFmtLTuJY6', icon: 'fa-person-falling' }
             ],
@@ -138,12 +138,14 @@
                 await signInAnonymously(auth);
 
                 // FIX: La ruta ahora tiene 6 segmentos para ser un documento válido
-                // artifacts (col) / appId (doc) / public (col) / data (doc) / siteConfig (col) / current (doc)
                 const docRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'siteConfig', 'current');
                 
                 onSnapshot(docRef, (docSnap) => {
-                    if (docSnap.exists()) siteData = docSnap.data();
-                    else setDoc(docRef, siteData);
+                    if (docSnap.exists()) {
+                        siteData = docSnap.data();
+                    } else {
+                        setDoc(docRef, siteData);
+                    }
                     renderApp();
                 }, (err) => {
                     console.warn("Fallo en sincronización, usando local:", err);
@@ -163,7 +165,7 @@
                         <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/graphy.png')] rounded-b-[3.5rem]"></div>
                         <div class="relative">
                             <p class="text-cyan-100 text-[10px] font-extrabold tracking-[0.3em] uppercase mb-2">Club Náutico Teques</p>
-                            <h1 class="text-3xl font-extrabold mb-6 tracking-tight">PH3 Bienvenida</h1>
+                            <h1 class="text-3xl font-extrabold mb-6 tracking-tight text-white">PH3 Bienvenida</h1>
                             <div class="bg-white/10 backdrop-blur-lg border border-white/30 rounded-3xl p-5 shadow-2xl">
                                 <div class="flex items-center justify-center mb-2"><i class="fa-solid fa-wifi text-xl mr-3 opacity-80 text-white"></i><span class="font-bold text-lg uppercase text-white">Teques_wifi</span></div>
                                 <div class="bg-white/95 text-teal-900 rounded-lg py-3 px-4 font-mono text-xl tracking-wider mb-4 shadow-inner border border-cyan-50">123456789</div>
@@ -181,7 +183,7 @@
                         </a>
                         <div class="grid grid-cols-2 gap-3">
                             <button onclick="window.open('https://maps.app.goo.gl/oweNu9vusZ8gK31t7', '_blank')" class="bg-white rounded-2xl p-4 shadow-md border border-cyan-50 flex flex-col items-center active:scale-95 transition-transform"><i class="fa-solid fa-location-arrow text-cyan-500 text-xl mb-1"></i><span class="text-[9px] font-black text-slate-500 uppercase tracking-widest uppercase">Llegada</span></button>
-                            <button onclick="scrollToSection('check-out')" class="bg-white rounded-2xl p-4 shadow-md border border-cyan-50 flex flex-col items-center text-emerald-600 active:scale-95 transition-transform"><i class="fa-solid fa-door-open text-xl mb-1"></i><span class="text-[9px] font-black uppercase text-emerald-600 tracking-widest uppercase">Salida</span></button>
+                            <button onclick="scrollToSection('check-out')" class="bg-white rounded-2xl p-4 shadow-md border border-cyan-50 flex flex-col items-center text-emerald-600 active:scale-95 transition-transform"><i class="fa-solid fa-door-open text-xl mb-1"></i><span class="text-[9px] font-black uppercase text-emerald-600 tracking-widest uppercase text-emerald-600">Salida</span></button>
                         </div>
                     </div>
 
@@ -189,16 +191,16 @@
                         <section class="space-y-3">
                             ${renderAccordion('Acceso y Cerradura', 'fa-key', 'cyan', `
                                 <div class="grid grid-cols-2 gap-3 pt-4 text-slate-700">
-                                    <div class="bg-white p-3 rounded-2xl border border-slate-100 text-center shadow-sm"><span class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Cluster</span><span class="text-slate-700 font-black">12A</span></div>
-                                    <div class="bg-white p-3 rounded-2xl border border-slate-100 text-center shadow-sm"><span class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Cajón Estac.</span><span class="text-slate-700 font-black">#23 (P3)</span></div>
+                                    <div class="bg-white p-3 rounded-2xl border border-slate-100 text-center shadow-sm"><span class="block text-[9px] font-bold text-slate-400 uppercase mb-1 text-slate-400 uppercase">Cluster</span><span class="text-slate-700 font-black">12A</span></div>
+                                    <div class="bg-white p-3 rounded-2xl border border-slate-100 text-center shadow-sm"><span class="block text-[9px] font-bold text-slate-400 uppercase mb-1 text-slate-400 uppercase">Cajón Estac.</span><span class="text-slate-700 font-black">#23 (P3)</span></div>
                                 </div>
-                                <div class="bg-white p-4 rounded-2xl border border-cyan-100 mb-4 shadow-inner text-[11px] text-slate-600 italic leading-relaxed">
+                                <div class="bg-white p-4 rounded-2xl border border-cyan-100 mb-4 shadow-inner text-[11px] text-slate-600 italic leading-relaxed text-slate-600 italic">
                                     La <strong>Caja de Seguridad Gris</strong> está frente a la puerta del PH3. El código se envía por mensaje privado antes de su check-in.<br><br>
                                     1. Toca pantalla para activar. 2. Presiona números que brillen. 3. Pasa la tarjeta física.
                                 </div>
                             `)}
                             ${renderAccordion('Reglas de la Casa', 'fa-clipboard-check', 'red', `
-                                <div class="space-y-3 py-4 text-[11px] text-slate-700 italic text-slate-700 italic">
+                                <div class="space-y-3 py-4 text-[11px] text-slate-700 italic text-slate-700 italic text-slate-700 italic">
                                     <div class="flex items-center gap-3"><i class="fa-solid fa-ban text-red-500 w-5 text-center"></i> <span><strong>PROHIBIDO FIESTAS:</strong> Estancia exclusivamente familiar únicamente.</span></div>
                                     <div class="flex items-center gap-3"><i class="fa-solid fa-volume-xmark text-red-500 w-5 text-center"></i> <span><strong>HORARIO SILENCIO:</strong> No ruidos exteriores tras las 11:00 PM.</span></div>
                                     <div class="flex items-center gap-3"><i class="fa-solid fa-snowflake text-cyan-500 w-5 text-center"></i> <span><strong>A/C:</strong> Por favor apague los aires si sale del departamento.</span></div>
@@ -207,8 +209,8 @@
                             `)}
                             ${renderAccordion('Instrucciones Generales', 'fa-house-laptop', 'indigo', `
                                 <div class="space-y-4 pt-4 pb-2">
-                                    <div class="bg-cyan-600 text-white p-4 rounded-2xl shadow-lg"><h5 class="font-black text-[10px] uppercase italic mb-2 text-white">Uso del Jacuzzi:</h5><p class="italic text-[10px] text-white">Para encender las burbujas, el agua DEBE superar el nivel de los jets para no dañar el motor.</p></div>
-                                    <div class="bg-indigo-600 text-white p-4 rounded-2xl shadow-lg"><h5 class="font-black text-[10px] uppercase italic mb-2 text-white">TV Roku:</h5><p class="italic text-[10px] text-white">Encendido botón rojo. Home para ver apps. Por favor cierre sesiones al salir.</p></div>
+                                    <div class="bg-cyan-600 text-white p-4 rounded-2xl shadow-lg"><h5 class="font-black text-[10px] uppercase italic mb-2 text-white text-white italic">Uso del Jacuzzi:</h5><p class="italic text-[10px] text-white">Para encender las burbujas, el agua DEBE superar el nivel de los jets para no dañar el motor.</p></div>
+                                    <div class="bg-indigo-600 text-white p-4 rounded-2xl shadow-lg"><h5 class="font-black text-[10px] uppercase italic mb-2 text-white text-white italic">TV Roku:</h5><p class="italic text-[10px] text-white text-white italic">Encendido botón rojo. Home para ver apps. Por favor cierre sesiones al salir.</p></div>
                                 </div>
                             `)}
                         </section>
@@ -217,8 +219,8 @@
                             <h3 class="text-[10px] font-black text-cyan-600 uppercase tracking-[0.3em] mb-4 pl-2 italic text-cyan-600">Clubes de Playa</h3>
                             <div class="carousel-container">${siteData.clubs.map(c => `
                                 <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-cyan-50 p-6 flex flex-col justify-between">
-                                    <div><div class="flex justify-between items-center mb-4"><h4 class="font-black text-cyan-900 text-lg italic uppercase tracking-tighter">${c.name}</h4><i class="fa-solid ${c.icon} text-cyan-500 text-2xl"></i></div><p class="text-[10px] opacity-70 mb-6 italic text-slate-600 leading-relaxed">${c.desc}</p></div>
-                                    <a href="${c.link}" target="_blank" class="w-full bg-cyan-600 text-white py-3 rounded-2xl font-black text-[10px] text-center tracking-widest uppercase active:scale-95 shadow-lg shadow-cyan-100 text-white">Ver en Maps</a>
+                                    <div><div class="flex justify-between items-center mb-4"><h4 class="font-black text-cyan-900 text-lg italic uppercase tracking-tighter">${c.name}</h4><i class="fa-solid ${c.icon} text-cyan-500 text-2xl text-cyan-500"></i></div><p class="text-[10px] opacity-70 mb-6 italic text-slate-600 leading-relaxed text-slate-600 italic">${c.desc}</p></div>
+                                    <a href="${c.link}" target="_blank" class="w-full bg-cyan-600 text-white py-3 rounded-2xl font-black text-[10px] text-center tracking-widest uppercase active:scale-95 shadow-lg shadow-cyan-100 text-white text-white">Ver en Maps</a>
                                 </div>`).join('')}</div>
                         </section>
 
@@ -226,11 +228,11 @@
                             <h3 class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em] mb-4 pl-2 italic text-emerald-600">Gastronomía</h3>
                             <div class="carousel-container">${siteData.restaurants.map(r => `
                                 <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-emerald-50 p-6 flex flex-col justify-between">
-                                    <div class="flex justify-between items-start mb-4 text-emerald-900"><h4 class="font-black text-lg italic uppercase tracking-tighter">${r.name}</h4><i class="fa-solid fa-utensils text-emerald-500 text-xl"></i></div>
-                                    <p class="text-[10px] opacity-60 italic mb-4 text-slate-600">${r.desc}</p>
+                                    <div class="flex justify-between items-start mb-4 text-emerald-900"><h4 class="font-black text-lg italic uppercase tracking-tighter">${r.name}</h4><i class="fa-solid fa-utensils text-emerald-500 text-xl text-emerald-500"></i></div>
+                                    <p class="text-[10px] opacity-60 italic mb-4 text-slate-600 text-slate-600 italic">${r.desc}</p>
                                     <div class="grid grid-cols-2 gap-2">
-                                        <button onclick="openContactOptions('${r.name}', '${r.phone}')" class="bg-emerald-50 text-emerald-700 py-3 rounded-xl font-black text-[9px] border border-emerald-100 active:scale-95 text-emerald-700">LLAMAR</button>
-                                        <a href="${r.link}" target="_blank" class="bg-emerald-600 text-white py-3 rounded-xl font-black text-[9px] flex items-center justify-center active:scale-95 text-white">📍 MAPA</a>
+                                        <button onclick="openContactOptions('${r.name}', '${r.phone}')" class="bg-emerald-50 text-emerald-700 py-3 rounded-xl font-black text-[9px] border border-emerald-100 active:scale-95 text-emerald-700 text-emerald-700">LLAMAR</button>
+                                        <a href="${r.link}" target="_blank" class="bg-emerald-600 text-white py-3 rounded-xl font-black text-[9px] flex items-center justify-center active:scale-95 text-white text-white">📍 MAPA</a>
                                     </div>
                                 </div>`).join('')}</div>
                         </section>
@@ -239,8 +241,8 @@
                             <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em] mb-4 pl-2 italic text-blue-600">Aventura</h3>
                             <div class="carousel-container">${siteData.adventure.map(a => `
                                 <div class="carousel-item bg-slate-900 rounded-[2.5rem] shadow-xl p-7 text-white flex flex-col justify-between">
-                                    <div><div class="flex justify-between items-center mb-4 text-white"><h4 class="font-black text-2xl tracking-tighter italic uppercase text-white">${a.name}</h4><i class="fa-solid ${a.icon || 'fa-ship'} text-blue-400 text-2xl text-blue-400"></i></div><p class="text-[10px] text-slate-400 italic mb-6 leading-relaxed text-slate-400 italic leading-relaxed">${a.desc}</p></div>
-                                    <button onclick="openContactOptions('${a.name}', '${a.phone}')" class="w-full bg-blue-600 py-4 rounded-2xl font-black text-[10px] tracking-widest active:scale-95 text-white uppercase shadow-lg shadow-blue-900/20 text-white">📞 Reservar Ahora</button>
+                                    <div><div class="flex justify-between items-center mb-4 text-white"><h4 class="font-black text-2xl tracking-tighter italic uppercase text-white">${a.name}</h4><i class="fa-solid ${a.icon || 'fa-ship'} text-blue-400 text-2xl text-blue-400"></i></div><p class="text-[10px] text-slate-400 italic mb-6 leading-relaxed text-slate-400 italic">${a.desc}</p></div>
+                                    <button onclick="openContactOptions('${a.name}', '${a.phone}')" class="w-full bg-blue-600 py-4 rounded-2xl font-black text-[10px] tracking-widest active:scale-95 text-white uppercase shadow-lg shadow-blue-900/20 text-white text-white">📞 Reservar Ahora</button>
                                 </div>`).join('')}</div>
                         </section>
 
@@ -248,49 +250,49 @@
                             <h3 class="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em] mb-4 pl-2 italic text-indigo-600">Más Actividades</h3>
                             <div class="carousel-container">${siteData.extra.map(x => `
                                 <div class="carousel-item bg-white rounded-[2.5rem] shadow-lg border border-indigo-50 p-6 flex flex-col justify-between">
-                                    <div><div class="flex justify-between items-center mb-4 text-indigo-900"><h4 class="font-black text-lg italic uppercase text-indigo-900">${x.name}</h4><i class="fa-solid ${x.icon || 'fa-star'} text-indigo-500 text-2xl text-indigo-500"></i></div><p class="text-[10px] opacity-70 mb-6 italic text-slate-600 leading-relaxed text-slate-600 leading-relaxed italic">${x.desc}</p></div>
+                                    <div><div class="flex justify-between items-center mb-4 text-indigo-900"><h4 class="font-black text-lg italic uppercase text-indigo-900 text-indigo-900">${x.name}</h4><i class="fa-solid ${x.icon || 'fa-star'} text-indigo-500 text-2xl text-indigo-500"></i></div><p class="text-[10px] opacity-70 mb-6 italic text-slate-600 leading-relaxed text-slate-600 italic leading-relaxed text-slate-600 italic leading-relaxed">${x.desc}</p></div>
                                     <div class="grid grid-cols-2 gap-2">
-                                        <button onclick="openContactOptions('${x.name}', '${x.phone}')" class="bg-indigo-50 text-indigo-700 py-3 rounded-xl font-black text-[9px] active:scale-95 text-indigo-700">LLAMAR</button>
-                                        ${x.link ? `<a href="${x.link}" target="_blank" class="bg-indigo-600 text-white py-3 rounded-xl font-black text-[9px] flex items-center justify-center active:scale-95 text-white">📍 MAPA</a>` : `<span></span>`}
+                                        <button onclick="openContactOptions('${x.name}', '${x.phone}')" class="bg-indigo-50 text-indigo-700 py-3 rounded-xl font-black text-[9px] active:scale-95 text-indigo-700 text-indigo-700">LLAMAR</button>
+                                        ${x.link ? `<a href="${x.link}" target="_blank" class="bg-indigo-600 text-white py-3 rounded-xl font-black text-[9px] flex items-center justify-center active:scale-95 text-white text-white">📍 MAPA</a>` : `<span></span>`}
                                     </div>
                                 </div>`).join('')}</div>
                         </section>
 
                         <section>
-                            <div class="bg-white rounded-[2.5rem] border border-emerald-100 shadow-md p-6 text-slate-700 text-center text-slate-700 text-center">
-                                <h4 class="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-5 italic text-emerald-700 uppercase">Pedidos y Servicios</h4>
+                            <div class="bg-white rounded-[2.5rem] border border-emerald-100 shadow-md p-6 text-slate-700 text-center text-slate-700 text-center text-slate-700 text-center">
+                                <h4 class="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-5 italic text-emerald-700 uppercase text-emerald-700 uppercase italic text-emerald-700 uppercase italic">Pedidos y Servicios</h4>
                                 <div class="space-y-2 mb-5">${siteData.delivery.map(d => `
                                     <button onclick="openContactOptions('${d.name}', '${d.phone}')" class="w-full bg-white p-3 rounded-xl border flex justify-between items-center text-xs text-slate-700 italic active:bg-slate-50">
                                         <span>${d.name}</span><i class="fa-solid fa-phone text-emerald-400"></i>
                                     </button>`).join('')}
                                 </div>
-                                <button onclick="openContactOptions('Taxi Seguro', '7343470734')" class="w-full bg-white p-4 rounded-xl border-2 border-cyan-100 flex justify-between items-center text-xs font-black text-cyan-700 active:scale-95 transition-transform text-cyan-700 uppercase italic"><span>🚕 Taxis Seguros</span><i class="fa-solid fa-phone"></i></button>
+                                <button onclick="openContactOptions('Taxi Seguro', '7343470734')" class="w-full bg-white p-4 rounded-xl border-2 border-cyan-100 flex justify-between items-center text-xs font-black text-cyan-700 active:scale-95 transition-transform text-cyan-700 uppercase italic text-cyan-700 uppercase italic"><span>🚕 Taxis Seguros</span><i class="fa-solid fa-phone"></i></button>
                             </div>
                         </section>
 
                         <section id="check-out">
-                            <div class="bg-slate-900 rounded-[3rem] p-9 text-white shadow-2xl text-center border-b-8 border-emerald-500 text-white shadow-2xl text-center">
-                                <h3 class="text-xl font-black mb-3 uppercase tracking-[0.2em] italic text-white uppercase tracking-widest text-white uppercase">Salida 12:00 PM</h3>
-                                <ul class="text-[10px] space-y-3 opacity-60 uppercase font-bold tracking-[0.3em] mb-8 text-white italic text-white italic">
+                            <div class="bg-slate-900 rounded-[3rem] p-9 text-white shadow-2xl text-center border-b-8 border-emerald-500 text-white shadow-2xl text-center text-white shadow-2xl text-center">
+                                <h3 class="text-xl font-black mb-3 uppercase tracking-[0.2em] italic text-white uppercase tracking-widest text-white uppercase text-white uppercase tracking-widest text-white uppercase tracking-widest text-white uppercase tracking-widest text-white uppercase">Salida 12:00 PM</h3>
+                                <ul class="text-[10px] space-y-3 opacity-60 uppercase font-bold tracking-[0.3em] mb-8 text-white italic text-white italic text-white italic">
                                     <li>Apagar luces y A/C</li>
                                     <li>Llaves en caja de seguridad</li>
                                     <li>Cerrar caja y mezclar el código</li>
                                 </ul>
-                                <p class="text-emerald-400 font-black text-2xl italic animate-pulse text-emerald-400 uppercase text-emerald-400 uppercase italic animate-pulse">¡Feliz Viaje! 👋</p>
+                                <p class="text-emerald-400 font-black text-2xl italic animate-pulse text-emerald-400 uppercase text-emerald-400 uppercase italic animate-pulse text-emerald-400 uppercase italic animate-pulse text-emerald-400 uppercase italic animate-pulse text-emerald-400 uppercase italic animate-pulse">¡Feliz Viaje! 👋</p>
                             </div>
                         </section>
                     </div>
 
-                    <footer class="bg-white pt-10 pb-0 relative overflow-hidden border-t border-slate-50 text-center bg-white pt-10 pb-0 relative overflow-hidden text-center">
-                        <div class="px-8 mb-12 relative z-20 text-red-500 text-red-500">
-                            <h3 class="text-[10px] font-black uppercase tracking-[0.5em] mb-8 italic text-red-500 uppercase text-red-500 italic uppercase">Emergencias</h3>
+                    <footer class="bg-white pt-10 pb-0 relative overflow-hidden border-t border-slate-50 text-center bg-white pt-10 pb-0 relative overflow-hidden text-center bg-white pt-10 pb-0 relative overflow-hidden text-center bg-white pt-10 pb-0 relative overflow-hidden text-center bg-white pt-10 pb-0 relative overflow-hidden text-center">
+                        <div class="px-8 mb-12 relative z-20 text-red-500 text-red-500 text-red-500 text-red-500 text-red-500 text-red-500">
+                            <h3 class="text-[10px] font-black uppercase tracking-[0.5em] mb-8 italic text-red-500 uppercase text-red-500 italic uppercase text-red-500 italic uppercase text-red-500 italic uppercase text-red-500 italic uppercase text-red-500 italic uppercase">Emergencias</h3>
                             <div class="grid grid-cols-3 gap-3">
-                                <button onclick="openContactOptions('Cruz Roja', '7343413301', 'https://maps.app.goo.gl/A6ADB9838fUmupkT9', true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700"><i class="fa-solid fa-truck-medical text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter text-red-700 uppercase">Cruz Roja</span></button>
-                                <button onclick="openContactOptions('Bomberos', '7343423400', null, true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700"><i class="fa-solid fa-fire-extinguisher text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter text-red-700 uppercase">Bomberos</span></button>
-                                <button onclick="openContactOptions('Policía', '7343422696', null, true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700"><i class="fa-solid fa-shield-halved text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter text-red-700 uppercase">Policía</span></button>
+                                <button onclick="openContactOptions('Cruz Roja', '7343413301', 'https://maps.app.goo.gl/A6ADB9838fUmupkT9', true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700 text-red-700 shadow-sm text-red-700 text-red-700 shadow-sm text-red-700 text-red-700 shadow-sm text-red-700 text-red-700 shadow-sm text-red-700"><i class="fa-solid fa-truck-medical text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter text-red-700 uppercase text-red-700 uppercase text-red-700 uppercase text-red-700 uppercase text-red-700 uppercase text-red-700 uppercase">Cruz Roja</span></button>
+                                <button onclick="openContactOptions('Bomberos', '7343423400', null, true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700 text-red-700 shadow-sm text-red-700 text-red-700 shadow-sm text-red-700 text-red-700 shadow-sm text-red-700 text-red-700 shadow-sm text-red-700"><i class="fa-solid fa-fire-extinguisher text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter text-red-700 uppercase text-red-700 uppercase text-red-700 uppercase text-red-700 uppercase text-red-700 uppercase text-red-700 uppercase">Bomberos</span></button>
+                                <button onclick="openContactOptions('Policía', '7343422696', null, true)" class="bg-red-50 border border-red-100 p-5 rounded-[2rem] flex flex-col items-center active:scale-95 shadow-sm text-red-700 text-red-700 shadow-sm text-red-700 text-red-700 shadow-sm text-red-700 text-red-700 shadow-sm text-red-700 text-red-700 shadow-sm text-red-700"><i class="fa-solid fa-shield-halved text-2xl mb-2 text-red-500"></i><span class="text-[8px] font-black uppercase tracking-tighter text-red-700 uppercase text-red-700 uppercase text-red-700 uppercase text-red-700 uppercase text-red-700 uppercase text-red-700 uppercase">Policía</span></button>
                             </div>
                         </div>
-                        <h2 class="text-2xl font-black tracking-[0.5em] text-cyan-400 uppercase italic pb-2 text-cyan-400 uppercase italic pb-2">Tequesquitengo</h2>
+                        <h2 class="text-2xl font-black tracking-[0.5em] text-cyan-400 uppercase italic pb-2 text-cyan-400 uppercase italic pb-2 text-cyan-400 uppercase italic pb-2 text-cyan-400 uppercase italic pb-2 text-cyan-400 uppercase italic pb-2 text-cyan-400 uppercase italic pb-2">Tequesquitengo</h2>
                         <div class="relative leading-[0]"><svg class="waves" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none"><defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" /></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0" fill="rgba(6, 182, 212, 0.2)" /><use href="#gentle-wave" x="48" y="3" fill="rgba(20, 184, 166, 0.15)" /></g></svg></div>
                     </footer>
                 </div>`;
@@ -319,14 +321,14 @@
                 { k: 'delivery', l: 'Servicios' }
             ];
             cats.forEach(cat => {
-                let html = `<div class="bg-slate-50 p-4 rounded-3xl mb-4 text-slate-700 shadow-inner"><h3 class="text-xs font-black mb-4 uppercase tracking-widest text-slate-400 italic">${cat.l}</h3><div class="space-y-4">`;
+                let html = `<div class="bg-slate-50 p-4 rounded-3xl mb-4 text-slate-700 shadow-inner text-slate-700 shadow-inner"><h3 class="text-xs font-black mb-4 uppercase tracking-widest text-slate-400 italic">${cat.l}</h3><div class="space-y-4">`;
                 siteData[cat.k].forEach((item, i) => {
-                    html += `<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative text-slate-700">
+                    html += `<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm relative text-slate-700 text-slate-700">
                         <button onclick="deleteItem('${cat.k}', ${i})" class="absolute top-2 right-2 text-red-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
-                        <input class="w-full border-b mb-2 p-1 text-sm font-bold outline-none text-slate-800" value="${item.name}" onchange="updateData('${cat.k}', i, 'name', this.value)">
-                        <textarea class="w-full border-b mb-2 p-1 text-[10px] italic outline-none text-slate-600" onchange="updateData('${cat.k}', i, 'desc', this.value)">${item.desc || ''}</textarea>
-                        <div class="flex gap-2"><input class="w-1/2 border-b p-1 text-[10px] outline-none text-slate-600" value="${item.phone || ''}" onchange="updateData('${cat.k}', i, 'phone', this.value)" placeholder="Tel">
-                        <input class="w-1/2 border-b p-1 text-[10px] outline-none text-slate-600" value="${item.link || ''}" onchange="updateData('${cat.k}', i, 'link', this.value)" placeholder="URL"></div>
+                        <input class="w-full border-b mb-2 p-1 text-sm font-bold outline-none text-slate-800 text-slate-800" value="${item.name}" onchange="updateData('${cat.k}', ${i}, 'name', this.value)">
+                        <textarea class="w-full border-b mb-2 p-1 text-[10px] italic outline-none text-slate-600 text-slate-600 italic" onchange="updateData('${cat.k}', ${i}, 'desc', this.value)">${item.desc || ''}</textarea>
+                        <div class="flex gap-2"><input class="w-1/2 border-b p-1 text-[10px] outline-none text-slate-600 text-slate-600" value="${item.phone || ''}" onchange="updateData('${cat.k}', ${i}, 'phone', this.value)" placeholder="Tel">
+                        <input class="w-1/2 border-b p-1 text-[10px] outline-none text-slate-600 text-slate-600" value="${item.link || ''}" onchange="updateData('${cat.k}', ${i}, 'link', this.value)" placeholder="URL"></div>
                     </div>`;
                 });
                 html += `<button onclick="addItem('${cat.k}')" class="w-full border-2 border-dashed border-slate-200 py-3 rounded-2xl text-slate-300 font-bold text-[10px] uppercase tracking-widest transition-colors hover:text-cyan-500 hover:border-cyan-200">+ AGREGAR ITEM</button></div></div>`;
@@ -344,7 +346,7 @@
             btn.disabled = true;
             try {
                 if (db) {
-                    // FIX: Aseguramos que la ruta de guardado también tenga 6 segmentos
+                    // FIX: La ruta de guardado ahora tiene 6 segmentos: /artifacts/ph3-teques-live/public/data/siteConfig/current
                     const docRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'siteConfig', 'current');
                     await setDoc(docRef, siteData);
                     alert("¡Guía actualizada en la nube!");
@@ -425,28 +427,28 @@
 
     <div id="contactModal" class="fixed inset-0 z-[100] hidden">
         <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeModal()"></div>
-        <div class="flex min-h-full items-center justify-center p-6 text-center text-slate-700">
-            <div class="relative transform overflow-hidden rounded-[3rem] bg-white text-left shadow-2xl transition-all w-full max-w-xs border border-cyan-50">
-                <div class="bg-white px-6 pb-10 pt-12 text-center relative">
+        <div class="flex min-h-full items-center justify-center p-6 text-center text-slate-700 text-center text-slate-700 text-center text-slate-700 text-center">
+            <div class="relative transform overflow-hidden rounded-[3rem] bg-white text-left shadow-2xl transition-all w-full max-w-xs border border-cyan-50 text-slate-700">
+                <div class="bg-white px-6 pb-10 pt-12 text-center relative text-slate-700">
                     <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-cyan-100 to-emerald-50 rounded-b-[50%] -mt-10 opacity-40"></div>
-                    <div class="relative z-10 text-slate-700 text-center text-slate-700 text-center">
-                        <h3 class="text-xl font-black mb-1 italic uppercase text-slate-800" id="modal-contact-name">Nombre</h3>
-                        <p class="text-2xl font-mono text-teal-800 font-black mb-10 italic" id="modal-contact-phone">0000000000</p>
+                    <div class="relative z-10 text-slate-700 text-center text-slate-700 text-center text-slate-700 text-center text-slate-700 text-center">
+                        <h3 class="text-xl font-black mb-1 italic uppercase text-slate-800 text-slate-800 uppercase" id="modal-contact-name">Nombre</h3>
+                        <p class="text-2xl font-mono text-teal-800 font-black mb-10 italic text-teal-800 italic" id="modal-contact-phone">0000000000</p>
                         <div class="space-y-3">
-                            <a id="btn-call" href="#" class="flex w-full justify-center items-center rounded-2xl bg-slate-900 px-4 py-4 text-[11px] font-black text-white shadow-xl uppercase tracking-widest text-white transition-transform">📞 LLAMAR</a>
-                            <a id="btn-whatsapp" href="#" target="_blank" class="flex w-full justify-center items-center rounded-2xl bg-[#25D366] py-4 text-[11px] font-black text-white shadow-xl italic text-white transition-transform">WHATSAPP</a>
-                            <a id="btn-map" href="#" target="_blank" class="hidden w-full justify-center items-center rounded-2xl bg-cyan-600 px-4 py-4 text-[11px] font-black text-white shadow-xl text-white uppercase transition-transform">📍 MAPA</a>
+                            <a id="btn-call" href="#" class="flex w-full justify-center items-center rounded-2xl bg-slate-900 px-4 py-4 text-[11px] font-black text-white shadow-xl uppercase tracking-widest text-white transition-transform text-white">📞 LLAMAR</a>
+                            <a id="btn-whatsapp" href="#" target="_blank" class="flex w-full justify-center items-center rounded-2xl bg-[#25D366] py-4 text-[11px] font-black text-white shadow-xl italic text-white transition-transform text-white">WHATSAPP</a>
+                            <a id="btn-map" href="#" target="_blank" class="hidden w-full justify-center items-center rounded-2xl bg-cyan-600 px-4 py-4 text-[11px] font-black text-white shadow-xl text-white uppercase transition-transform text-white">📍 MAPA</a>
                         </div>
                     </div>
                 </div>
-                <div class="bg-slate-50 px-4 py-4 text-center"><button class="text-[10px] font-black text-slate-400 tracking-widest uppercase" onclick="closeModal()">Cerrar</button></div>
+                <div class="bg-slate-50 px-4 py-4 text-center text-slate-700"><button class="text-[10px] font-black text-slate-400 tracking-widest uppercase text-slate-400" onclick="closeModal()">Cerrar</button></div>
             </div>
         </div>
     </div>
 
-    <a href="https://wa.me/525554317512" target="_blank" class="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white py-4 px-6 rounded-full shadow-2xl flex items-center gap-3 hover:bg-[#20bd5a] transition-all pulse-aqua border-2 border-white/30 text-white">
+    <a href="https://wa.me/525554317512" target="_blank" class="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white py-4 px-6 rounded-full shadow-2xl flex items-center gap-3 hover:bg-[#20bd5a] transition-all pulse-aqua border-2 border-white/30 text-white text-white">
         <i class="fa-brands fa-whatsapp text-2xl"></i>
-        <span class="font-black text-xs tracking-tight uppercase">AYUDA HOST</span>
+        <span class="font-black text-xs tracking-tight uppercase text-white">AYUDA HOST</span>
     </a>
 </body>
 </html>
