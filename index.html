@@ -31,12 +31,14 @@
             70% { box-shadow: 0 0 0 12px rgba(37, 211, 102, 0); }
             100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
         }
+
+        @keyframes weatherFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        .weather-in { animation: weatherFadeIn 0.5s ease forwards; }
     </style>
 </head>
 <body class="bg-[#F0FDFD] text-slate-800 antialiased">
 
     <div id="app-content" class="max-w-md mx-auto bg-white min-h-screen shadow-2xl overflow-hidden relative border-x border-cyan-50 flex flex-col">
-        <!-- Loader Inicial -->
         <div class="p-20 text-center text-cyan-600 flex flex-col items-center justify-center min-h-screen">
             <i class="fa-solid fa-circle-notch animate-spin text-4xl mb-4 text-cyan-500"></i>
             <p class="font-bold uppercase tracking-widest text-xs text-cyan-700">Sincronizando PH3...</p>
@@ -66,11 +68,7 @@
             <h2 class="text-2xl font-black text-slate-800 italic uppercase tracking-tighter">Panel de Control</h2>
             <button onclick="closeAdminPanel()" class="bg-slate-100 p-3 rounded-full text-slate-500 active:scale-90 transition-transform"><i class="fa-solid fa-xmark"></i></button>
         </div>
-
-        <div id="admin-editor" class="space-y-8 pb-32 text-slate-700">
-            <!-- Los formularios se generan dinámicamente -->
-        </div>
-
+        <div id="admin-editor" class="space-y-8 pb-32 text-slate-700"></div>
         <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t flex gap-2 max-w-md mx-auto z-[110]">
             <button onclick="saveChanges()" id="saveBtn" class="flex-grow bg-emerald-600 text-white py-4 rounded-2xl font-black shadow-lg active:scale-95 transition-all uppercase tracking-widest text-xs">
                 GUARDAR CAMBIOS EN LA NUBE
@@ -89,7 +87,6 @@
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // --- CONFIGURACIÓN DE FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyB1u6Bz1PsjPUuczQ6ZjvYaQVCxUbWdj9Q",
             authDomain: "airbnb-e780c.firebaseapp.com",
@@ -104,7 +101,6 @@
 
         let db, auth, siteData;
 
-        // DATOS DE RESPALDO
         siteData = {
             clubs: [
                 { id: 1, name: 'Paradise', desc: 'Excelente vista, alberca, bar y acceso directo al lago.', link: 'https://share.google/YlpZUbnx8PZsF0HMq', icon: 'fa-umbrella-beach' },
@@ -130,6 +126,42 @@
             ]
         };
 
+        // ── CLIMA ──────────────────────────────────────────────
+        const WMO_ICONS = {
+            0:['☀️','Despejado'], 1:['🌤️','Mayormente despejado'], 2:['⛅','Parcialmente nublado'],
+            3:['☁️','Nublado'], 45:['🌫️','Neblina'], 48:['🌫️','Neblina con escarcha'],
+            51:['🌦️','Llovizna ligera'], 53:['🌦️','Llovizna'], 55:['🌧️','Llovizna intensa'],
+            61:['🌧️','Lluvia ligera'], 63:['🌧️','Lluvia'], 65:['🌧️','Lluvia intensa'],
+            80:['🌦️','Chubascos ligeros'], 81:['🌧️','Chubascos'], 82:['⛈️','Chubascos fuertes'],
+            95:['⛈️','Tormenta'], 99:['⛈️','Tormenta con granizo']
+        };
+
+        async function fetchWeather() {
+            try {
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=18.6167&longitude=-99.2333&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,uv_index&wind_speed_unit=kmh&timezone=America%2FMexico_City');
+                if (!res.ok) throw new Error();
+                const d = (await res.json()).current;
+                const [icon, desc] = WMO_ICONS[d.weather_code] || ['🌡️', 'Variable'];
+                const uv = d.uv_index <= 2 ? 'UV Bajo' : d.uv_index <= 5 ? 'UV Moderado' : d.uv_index <= 7 ? 'UV Alto' : 'UV Muy Alto';
+
+                document.getElementById('weather-icon').textContent = icon;
+                document.getElementById('weather-temp').textContent = Math.round(d.temperature_2m);
+                document.getElementById('weather-desc').textContent = desc;
+                document.getElementById('weather-humidity').textContent = `${d.relative_humidity_2m}% humedad`;
+                document.getElementById('weather-wind').textContent = `${Math.round(d.wind_speed_10m)} km/h`;
+                document.getElementById('weather-uv').textContent = uv;
+
+                document.getElementById('weather-loading').classList.add('hidden');
+                const dataEl = document.getElementById('weather-data');
+                dataEl.classList.remove('hidden');
+                dataEl.classList.add('weather-in');
+            } catch {
+                document.getElementById('weather-loading').classList.add('hidden');
+                document.getElementById('weather-error').classList.remove('hidden');
+            }
+        }
+        // ── FIN CLIMA ──────────────────────────────────────────
+
         async function init() {
             try {
                 const app = initializeApp(firebaseConfig);
@@ -138,13 +170,9 @@
                 await signInAnonymously(auth);
 
                 const docRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'siteConfig', 'current');
-                
                 onSnapshot(docRef, (docSnap) => {
-                    if (docSnap.exists()) {
-                        siteData = docSnap.data();
-                    } else {
-                        setDoc(docRef, siteData);
-                    }
+                    if (docSnap.exists()) siteData = docSnap.data();
+                    else setDoc(docRef, siteData);
                     renderApp();
                 }, (err) => {
                     console.warn("Fallo en sincronización, usando local:", err);
@@ -164,7 +192,48 @@
                         <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/graphy.png')] rounded-b-[3.5rem]"></div>
                         <div class="relative">
                             <p class="text-cyan-100 text-[10px] font-extrabold tracking-[0.3em] uppercase mb-2">Club Náutico Teques</p>
-                            <h1 class="text-3xl font-extrabold mb-6 tracking-tight text-white">PH3 Bienvenida</h1>
+                            <h1 class="text-3xl font-extrabold mb-4 tracking-tight text-white">PH3 Bienvenida</h1>
+
+                            <!-- WIDGET CLIMA -->
+                            <div id="weather-widget" class="bg-white/10 backdrop-blur-lg border border-white/30 rounded-2xl px-4 py-3 mb-4 flex items-center justify-between min-h-[56px]">
+                                <div id="weather-loading" class="flex items-center gap-2 w-full justify-center text-white/70 text-xs font-bold uppercase tracking-widest">
+                                    <i class="fa-solid fa-circle-notch animate-spin text-sm"></i>
+                                    <span>Obteniendo clima...</span>
+                                </div>
+                                <div id="weather-data" class="hidden w-full">
+                                    <div class="flex items-center justify-between w-full">
+                                        <div class="flex items-center gap-3">
+                                            <span id="weather-icon" class="text-3xl leading-none"></span>
+                                            <div class="text-left">
+                                                <div class="flex items-end gap-1">
+                                                    <span id="weather-temp" class="text-2xl font-extrabold text-white leading-none"></span>
+                                                    <span class="text-white/60 text-xs font-bold mb-0.5">°C</span>
+                                                </div>
+                                                <p id="weather-desc" class="text-[10px] font-bold text-white/70 uppercase tracking-widest mt-0.5"></p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right space-y-1">
+                                            <div class="flex items-center gap-1.5 justify-end">
+                                                <i class="fa-solid fa-droplet text-[9px] text-cyan-200"></i>
+                                                <span id="weather-humidity" class="text-[10px] font-bold text-white/80"></span>
+                                            </div>
+                                            <div class="flex items-center gap-1.5 justify-end">
+                                                <i class="fa-solid fa-wind text-[9px] text-cyan-200"></i>
+                                                <span id="weather-wind" class="text-[10px] font-bold text-white/80"></span>
+                                            </div>
+                                            <div class="flex items-center gap-1.5 justify-end">
+                                                <i class="fa-solid fa-sun text-[9px] text-yellow-200"></i>
+                                                <span id="weather-uv" class="text-[10px] font-bold text-white/80"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="weather-error" class="hidden w-full text-center text-white/50 text-[10px] font-bold italic">
+                                    Sin datos de clima disponibles
+                                </div>
+                            </div>
+                            <!-- FIN WIDGET CLIMA -->
+
                             <div class="bg-white/10 backdrop-blur-lg border border-white/30 rounded-3xl p-5 shadow-2xl">
                                 <div class="flex items-center justify-center mb-2"><i class="fa-solid fa-wifi text-xl mr-3 opacity-80 text-white"></i><span class="font-bold text-lg uppercase text-white">Teques_wifi</span></div>
                                 <div class="bg-white/95 text-teal-900 rounded-lg py-3 px-4 font-mono text-xl tracking-wider mb-4 shadow-inner border border-cyan-50">123456789</div>
@@ -304,7 +373,9 @@
                         <div class="relative leading-[0]"><svg class="waves" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none"><defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" /></defs><g class="parallax"><use href="#gentle-wave" x="48" y="0" fill="rgba(6, 182, 212, 0.2)" /><use href="#gentle-wave" x="48" y="3" fill="rgba(20, 184, 166, 0.15)" /></g></svg></div>
                     </footer>
                 </div>`;
+
             renderAdminForms();
+            fetchWeather();
         }
 
         function renderAccordion(title, icon, color, content) {
@@ -319,7 +390,7 @@
 
         function renderAdminForms() {
             const editor = document.getElementById('admin-editor');
-            if(!editor) return;
+            if (!editor) return;
             editor.innerHTML = '';
             const cats = [
                 { k: 'clubs', l: 'Clubes de Playa' },
@@ -347,7 +418,7 @@
         window.updateData = (cat, i, field, val) => { siteData[cat][i][field] = val; };
         window.addItem = (cat) => { siteData[cat].push({ name: 'Nuevo Item', desc: '', phone: '', link: '', icon: 'fa-star' }); renderAdminForms(); };
         window.deleteItem = (cat, i) => { siteData[cat].splice(i, 1); renderAdminForms(); };
-        
+
         window.saveChanges = async () => {
             const btn = document.getElementById('saveBtn');
             btn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin mr-2"></i> SINCRONIZANDO...';
@@ -393,8 +464,7 @@
         };
 
         window.copyWifi = () => {
-            const pass = '123456789';
-            navigator.clipboard.writeText(pass);
+            navigator.clipboard.writeText('123456789');
             const btn = document.getElementById('wifiBtn');
             btn.innerHTML = '<span>¡COPIADA!</span>';
             setTimeout(() => { renderApp(); }, 2000);
@@ -403,7 +473,6 @@
         window.scrollToSection = (id) => document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
 
         window.openContactOptions = (name, phone, mapUrl = null, isEmergency = false) => {
-            const modal = document.getElementById('contactModal');
             document.getElementById('modal-contact-name').innerText = name;
             document.getElementById('modal-contact-phone').innerText = phone;
             document.getElementById('btn-call').href = `tel:${phone}`;
@@ -413,7 +482,7 @@
             const mapBtn = document.getElementById('btn-map');
             if (mapUrl) { mapBtn.href = mapUrl; mapBtn.classList.replace('hidden', 'flex'); }
             else mapBtn.classList.replace('flex', 'hidden');
-            modal.classList.remove('hidden');
+            document.getElementById('contactModal').classList.remove('hidden');
         };
 
         window.closeModal = () => document.getElementById('contactModal').classList.add('hidden');
@@ -432,6 +501,7 @@
         init();
     </script>
 
+    <!-- MODAL CONTACTO -->
     <div id="contactModal" class="fixed inset-0 z-[100] hidden text-slate-700">
         <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeModal()"></div>
         <div class="flex min-h-full items-center justify-center p-6 text-center text-slate-700">
@@ -453,6 +523,7 @@
         </div>
     </div>
 
+    <!-- BOTÓN WHATSAPP HOST -->
     <a href="https://wa.me/525554317512" target="_blank" class="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white py-4 px-6 rounded-full shadow-2xl flex items-center gap-3 hover:bg-[#20bd5a] transition-all pulse-aqua border-2 border-white/30 text-white">
         <i class="fa-brands fa-whatsapp text-2xl text-white"></i>
         <span class="font-black text-xs tracking-tight uppercase text-white">AYUDA HOST</span>
